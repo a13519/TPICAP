@@ -20,7 +20,7 @@ version = '1.0-SNAPSHOT'
 
 
 dependencies {
-    implementation files('libs/iConnect.jar')
+    implementation files('/Users/songzou/Documents/IdeaProjects/TPICAP/ICAPConnector/libs/iConnect.jar')
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
