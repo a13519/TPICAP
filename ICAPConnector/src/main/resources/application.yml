@@ -1,0 +1,13 @@
+
+
+tracing:
+  message:
+    root: /abc
+    level: 2          # 0: Nothing to trace (not recommended)
+                      # 1: record all messages
+                      # 2: log messages in DEBUG
+                      # 3: log outbound messages in DEBUG
+    detailed: true    # to log message content
+    housekeeping: 0       # 0: no housekeeping
+                          # n: days to clean
+
