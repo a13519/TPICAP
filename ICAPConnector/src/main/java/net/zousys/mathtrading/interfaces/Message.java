@@ -6,6 +6,4 @@ public interface Message {
     public <T extends ICMsg> ICMsg message();
     public String getType();
     public String getId();
-    public byte[] serialize();
-    public Message deserialize(byte[] playload);
 }

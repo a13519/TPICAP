@@ -1,6 +1,7 @@
 package net.zousys.mathtrading.interfaces.icap;
 
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.Message;
@@ -14,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Flow;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -36,7 +38,10 @@ public class ICAPSource implements Source {
     private Connector[] connectors;
     private Lock lock = new ReentrantLock();
     private Condition write = lock.newCondition();
-
+    @Getter
+    private AtomicLong collected = new AtomicLong(0l);
+    @Getter
+    private AtomicLong consumed = new AtomicLong(0l);
     @Autowired
     public ICAPSource(
             Connector[] connectors,
@@ -62,6 +67,7 @@ public class ICAPSource implements Source {
                 while(true) {
                     if (!queue.isEmpty()) {
                         subscriber.onNext(queue.poll());
+                        consumed.addAndGet(1);
                     } else {
                         write.await();
                     }
@@ -70,10 +76,17 @@ public class ICAPSource implements Source {
                 log.error("Exception from taking message: "+ e.getLocalizedMessage());
             }
         }, processorService));
+
     }
 
     @Override
     public void checkSession() {
         Arrays.stream(connectors).forEach(connector -> connector.maintainSession());
+    }
+
+    @Override
+    public void pollingPush(Message message) {
+        collected.addAndGet(1);
+        queue.add(message);
     }
 }

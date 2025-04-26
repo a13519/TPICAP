@@ -11,3 +11,6 @@ tracing:
     housekeeping: 0       # 0: no housekeeping
                           # n: days to clean
 
+pooling:
+  active: true
+  path: /cba
