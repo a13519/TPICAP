@@ -21,6 +21,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
+/**
+ *
+ */
 @Slf4j
 @Component
 public class ICAPSource implements Source {
@@ -42,6 +45,14 @@ public class ICAPSource implements Source {
     private AtomicLong collected = new AtomicLong(0l);
     @Getter
     private AtomicLong consumed = new AtomicLong(0l);
+
+    /**
+     *
+     * @param connectors
+     * @param collectorService
+     * @param processorService
+     * @param subscriber
+     */
     @Autowired
     public ICAPSource(
             Connector[] connectors,
@@ -55,6 +66,9 @@ public class ICAPSource implements Source {
         startDeamon();
     }
 
+    /**
+     *
+     */
     @Override
     public void startDeamon() {
         try {
@@ -79,11 +93,18 @@ public class ICAPSource implements Source {
 
     }
 
+    /**
+     *
+     */
     @Override
     public void checkSession() {
         Arrays.stream(connectors).forEach(connector -> connector.maintainSession());
     }
 
+    /**
+     *
+     * @param message
+     */
     @Override
     public void pollingPush(Message message) {
         collected.addAndGet(1);
