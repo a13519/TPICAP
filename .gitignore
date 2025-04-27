@@ -1,2 +1,14 @@
 /.idea/
 /ICAPConnector.iml
+/loan-processor.iml
+/loan-source.iml
+/Stream.iml
+/Skipper.iml
+/Skipper/build/
+/Stream/.gradle/
+/Stream/.gradle/8.10/
+/Stream/.gradle/buildOutputCleanup/
+/Stream/.gradle/vcs-1/
+/Stream/build/
+/ICAPConnector/.gradle/
+/ICAPConnector/build/

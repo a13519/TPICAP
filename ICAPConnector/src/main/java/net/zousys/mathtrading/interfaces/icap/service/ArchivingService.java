@@ -39,9 +39,9 @@ public class ArchivingService {
     @Scheduled(cron = "0 0 2 * * ?")
     public void archiveAll() {
         try {
-            archiveJSONMessageFiles(success);
-            archiveJSONMessageFiles(pending);
-            archiveJSONMessageFiles(failure);
+            archiveMessageFiles(success);
+            archiveMessageFiles(pending);
+            archiveMessageFiles(failure);
         } catch (IOException e) {
             log.error("Archive caught exception: {}", e.getLocalizedMessage());
         }
@@ -50,12 +50,9 @@ public class ArchivingService {
      * @param file
      * @throws IOException
      */
-    public void archiveJSONMessageFiles(File file) throws IOException {
-        // Generate archive file name with timestamp
+    public void archiveMessageFiles(File file) throws IOException {
         String archiveFileName = String.format(archiverPath, file.getName(), System.currentTimeMillis());
         Path archivePath = Paths.get(archiveFileName);
-
-        // Ensure archive directory exists
         Files.createDirectories(archivePath.getParent());
 
         try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archiveFileName))) {
@@ -64,7 +61,6 @@ public class ArchivingService {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     if (Files.isRegularFile(file) && isOlderThanThreshold(attrs)) {
-                        // Add file to ZIP
                         String entryName = basePath.relativize(file).toString();
                         zos.putNextEntry(new ZipEntry(entryName));
                         Files.copy(file, zos);
@@ -75,7 +71,6 @@ public class ArchivingService {
                 }
             });
         }
-
         log.info("Archive created: " + archiveFileName);
     }
 

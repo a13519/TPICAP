@@ -1,0 +1,40 @@
+spring:
+  cloud:
+    dataflow:
+      server:
+        port: 9393 # Default port for Data Flow server
+      task:
+        platform:
+          local:
+            accounts:
+              default:
+                deployer: local
+    deployer:
+      local: # Local deployer properties
+        working-directories-root: ./dataflow-work-dir
+        delete-files-on-exit: true
+        java-opts: -Xmx1024m
+      cloudfoundry: # Explicitly disable Cloud Foundry
+        enabled: false
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+  datasource:
+    url: jdbc:h2:file:./data/streamdb;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+    driverClassName: org.h2.Driver
+    username: math_user
+    password: q1w2E#R$
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: never
