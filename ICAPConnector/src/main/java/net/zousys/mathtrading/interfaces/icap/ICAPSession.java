@@ -2,12 +2,15 @@ package net.zousys.mathtrading.interfaces.icap;
 
 import com.icap.iConnect.srcMsgs.enums.EICCompressionType;
 import com.icap.iConnect.srcMsgs.enums.EICErr;
+import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcSession.ICCallback;
 import com.icap.iConnect.srcSession.ICSession;
 import com.icap.iConnect.srcSession.ICSessionMngr;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.SessionException;
+
+import java.util.List;
 
 @Slf4j
 public class ICAPSession {
@@ -55,5 +58,40 @@ public class ICAPSession {
             log.info("Login parameters not set up properly");
         }
         throw new SessionException("Exception thrown because of connecting and / or auth failure"+err);
+    }
+
+    /**
+     *
+     * @param vRequests
+     */
+    protected void dispath(List<ICMsg> vRequests) {
+        if (vRequests != null) {
+            vRequests.forEach(icm -> {
+                EICErr eicErr = icSession.send(icm);
+                if (eicErr == EICErr.eErrSuccess) {
+                    log.info("Request has been successfully dispatched: "+icm);
+                } else {
+                    log.error("Request dipatched with negative ack: "+ icm);
+                }
+            });
+        }
+    }
+
+    /**
+     *
+     * @param msgList
+     * @return
+     */
+    protected boolean closeSession(List<ICMsg> msgList) {
+        if (msgList!=null && msgList.size()>0) {
+            msgList.forEach(msg->icSession.send(msg));
+        }
+        icSession.disconnect();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            log.warn("Closing session, sleep interruption. Program continue: " + e.getLocalizedMessage());
+        }
+        return true;
     }
 }

@@ -1,0 +1,76 @@
+package net.zousys.mathtrading.interfaces.icap.service;
+
+import lombok.extern.slf4j.Slf4j;
+import net.zousys.mathtrading.interfaces.icap.ICAPSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.util.Arrays;
+
+@Slf4j
+@Service
+public class PTFService {
+    private boolean readyheartChecking = false;
+    @Autowired
+    private ICAPSource icapSource;
+
+    @Value("${app.tracing.archiving.age}")
+    private int ageInDays;
+    @Value("${app.tracing.path.success}")
+    private String success;
+    @Value("${app.tracing.path.failure}")
+    private String failure;
+    @Value("${app.tracing.path.pending}")
+    private String pending;
+
+    private File successFile = new File(success);
+    private File failureFile = new File(failure);
+    private File pendingFile = new File(pending);
+    /**
+     *
+     */
+    public void startPTFInterface() {
+        icapSource.startDeamon();
+        readyheartChecking = true;
+    }
+
+    /**
+     *
+     */
+    @Scheduled(fixedRateString = "${app.connection.refresh:240000}")
+    private void sessionChecking() {
+        if (readyheartChecking) {
+            icapSource.checkSession();
+        }
+    }
+
+    /**
+     *
+     */
+    @Scheduled(fixedRateString = "${app.trace.archiving.interval:86400000}")
+    private void archiving() {
+        long age = ageInDays * 24 * 60 * 60 * 1000L;
+        archiveFile(successFile, age);
+        archiveFile(failureFile, age);
+        archiveFile(pendingFile, age);
+    }
+
+    /**
+     *
+     * @param path
+     * @param age
+     */
+    private static final void archiveFile(File path, long age) {
+        long current = System.currentTimeMillis();
+        Arrays.stream(path.listFiles()).toList().forEach(file -> {
+            if (current - file.lastModified() > age) {
+                if (!file.delete()) {
+                    log.warn("File {} is not deleted", file.getAbsolutePath());
+                }
+            }
+        });
+    }
+}

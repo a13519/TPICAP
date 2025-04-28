@@ -12,3 +12,8 @@
 /Stream/build/
 /ICAPConnector/.gradle/
 /ICAPConnector/build/
+/data/
+/loan-processor/build/
+/loan-source/.gradle/
+/loan-source/build/
+/Skipper/.gradle/
