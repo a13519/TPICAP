@@ -32,12 +32,11 @@ public class ICAPMessage implements Message {
     }
 
     /**
-     *
      * @param playload
      * @return
      */
     public static Message form(byte[] playload) {
-        if (playload!=null) {
+        if (playload != null) {
             ICMessageBuffer icMessageBuffer = new ICMessageBuffer();
             icMessageBuffer.put(playload);
             ICMsg icMsg = new ICMsg();

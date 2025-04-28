@@ -1,7 +1,6 @@
 package net.zousys.mathtrading.interfaces.icap;
 
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.Message;
@@ -12,13 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Flow;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
 /**
@@ -70,11 +64,11 @@ public class ICAPSource implements Source {
         }
         IntStream.range(0, poolProcessor).forEach(i -> CompletableFuture.runAsync(() -> {
             while (true) {
-                    if (!icapMessageRepo.isEmpty()) {
-                        subscriber.onNext(icapMessageRepo.poll());
-                    } else {
-                        icapMessageRepo.await();
-                    }
+                if (!icapMessageRepo.isEmpty()) {
+                    subscriber.onNext(icapMessageRepo.poll());
+                } else {
+                    icapMessageRepo.await();
+                }
             }
         }, processorService));
 

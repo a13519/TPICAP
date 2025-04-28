@@ -13,31 +13,31 @@ import org.springframework.stereotype.Component;
 @EnableBinding(LoanProcessor.class)
 public class LoanProcessing {
 
-  private static final Long MAX_AMOUNT = 10000L;
-  private LoanProcessor processor;
+    private static final Long MAX_AMOUNT = 10000L;
+    private LoanProcessor processor;
 
-  @Autowired
-  public LoanProcessing(LoanProcessor processor) {
-    this.processor = processor;
-  }
-
-  @StreamListener(LoanProcessor.APPLICATIONS_IN)
-  public void processLoanApplication(Loan loan) {
-    log.info("Loan application {} from {} for ${} with id {}", loan.getStatus(), loan.getName(), loan.getAmount(), loan.getUuid());
-
-    if (loan.getAmount() > MAX_AMOUNT) {
-      loan.setStatus(Statuses.DECLINED.name());
-      processor.declined().send(message(loan));
-    } else {
-      loan.setStatus(Statuses.APPROVED.name());
-      processor.approved().send(message(loan));
+    @Autowired
+    public LoanProcessing(LoanProcessor processor) {
+        this.processor = processor;
     }
 
-    log.info("Loan application {} from {} for ${} with id {}", loan.getStatus(), loan.getName(), loan.getAmount(), loan.getUuid());
+    @StreamListener(LoanProcessor.APPLICATIONS_IN)
+    public void processLoanApplication(Loan loan) {
+        log.info("Loan application {} from {} for ${} with id {}", loan.getStatus(), loan.getName(), loan.getAmount(), loan.getUuid());
 
-  }
+        if (loan.getAmount() > MAX_AMOUNT) {
+            loan.setStatus(Statuses.DECLINED.name());
+            processor.declined().send(message(loan));
+        } else {
+            loan.setStatus(Statuses.APPROVED.name());
+            processor.approved().send(message(loan));
+        }
 
-  private static final <T> Message<T> message(T val) {
-    return MessageBuilder.withPayload(val).build();
-  }
+        log.info("Loan application {} from {} for ${} with id {}", loan.getStatus(), loan.getName(), loan.getAmount(), loan.getUuid());
+
+    }
+
+    private static final <T> Message<T> message(T val) {
+        return MessageBuilder.withPayload(val).build();
+    }
 }

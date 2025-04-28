@@ -10,6 +10,7 @@ import org.springframework.messaging.Message;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -17,18 +18,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LoansourceApplicationTest {
 
-  @Autowired
-  private MessageCollector messageCollector;
+    @Autowired
+    private MessageCollector messageCollector;
 
-  @Autowired
-  private Source source;
+    @Autowired
+    private Source source;
 
-  @Test
-  public void testLoanSender() throws Exception {
-    Message message = this.messageCollector.forChannel(this.source.output()).poll(1, TimeUnit.SECONDS);
-    String usageDetailJSON = message.getPayload().toString();
-    assertTrue(usageDetailJSON.contains("uuid"));
-    assertTrue(usageDetailJSON.contains("name"));
-    assertTrue(usageDetailJSON.contains("amount"));
-  }
+    @Test
+    public void testLoanSender() throws Exception {
+        Message message = this.messageCollector.forChannel(this.source.output()).poll(1, TimeUnit.SECONDS);
+        String usageDetailJSON = message.getPayload().toString();
+        assertTrue(usageDetailJSON.contains("uuid"));
+        assertTrue(usageDetailJSON.contains("name"));
+        assertTrue(usageDetailJSON.contains("amount"));
+    }
 }

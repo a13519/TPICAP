@@ -10,12 +10,12 @@ import org.springframework.context.event.EventListener;
 @SpringBootApplication
 public class LoanProcessingApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(LoanProcessingApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(LoanProcessingApplication.class, args);
+    }
 
-  @EventListener(ApplicationStartedEvent.class)
-  void logStartEvent(){
-    log.info("The Loan-source Application has started...");
-  }
+    @EventListener(ApplicationStartedEvent.class)
+    void logStartEvent() {
+        log.info("The Loan-source Application has started...");
+    }
 }

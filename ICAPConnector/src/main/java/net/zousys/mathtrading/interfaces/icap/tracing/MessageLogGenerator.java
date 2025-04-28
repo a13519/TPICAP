@@ -3,13 +3,8 @@ package net.zousys.mathtrading.interfaces.icap.tracing;
 import com.icap.iConnect.srcMsgs.iCMsg.ICExtension;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.ThreadContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  *
@@ -80,7 +75,6 @@ public class MessageLogGenerator {
     }
 
     /**
-     *
      * @param msg
      * @param strName
      * @param strLog

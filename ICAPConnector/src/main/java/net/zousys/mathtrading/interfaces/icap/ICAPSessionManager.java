@@ -9,22 +9,28 @@ import com.icap.iConnect.srcSession.ICSessionMngr;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.SessionException;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
 @Slf4j
-public class ICAPSession {
+public class ICAPSessionManager {
+    @Value("${app.connection.proxyHost:null}")
+    private String proxyHost;
+    @Value("${app.connection.proxyPort:-1}")
+    private int proxyPort;
+
     @Getter
     private ICSession icSession;
     private ServerSignature serverSignature;
     private ICCallback icCallback;
-    protected ICAPSession(ServerSignature serverSignature, ICCallback icCallback) {
+
+    protected ICAPSessionManager(ServerSignature serverSignature, ICCallback icCallback) {
         this.serverSignature = serverSignature;
         this.icCallback = icCallback;
     }
 
     /**
-     *
      * @throws SessionException
      */
     protected void openSession() throws SessionException {
@@ -38,14 +44,16 @@ public class ICAPSession {
         icSession.setReconnectInterval(0);
         icSession.setCheckHeartbeatTimeout(30 * 1000);
         icSession.setCompression(EICCompressionType.eCompressedData);
-
+        if (proxyHost!=null&&proxyPort!=-1) {
+            icSession.setProxyHostPort(proxyHost, proxyPort);
+        }
         EICErr err = icSession.connect();
         if (EICErr.eErrSuccess == err) {
             log.info("Successful login");
-            return ;
+            return;
         } else if (EICErr.eErrSessionConnected == err) {
             log.warn("Session already connected");
-            return ;
+            return;
         } else if (EICErr.eErrTimeOut == err) {
             log.info("Timeout sending login");
         } else if (EICErr.eErrHostname == err || EICErr.eErrHostPort == err) {
@@ -57,11 +65,10 @@ public class ICAPSession {
         } else if (EICErr.eErrLoginArgs == err) {
             log.info("Login parameters not set up properly");
         }
-        throw new SessionException("Exception thrown because of connecting and / or auth failure"+err);
+        throw new SessionException("Exception thrown because of connecting and / or auth failure" + err);
     }
 
     /**
-     *
      * @param vRequests
      */
     protected void dispath(List<ICMsg> vRequests) {
@@ -69,22 +76,21 @@ public class ICAPSession {
             vRequests.forEach(icm -> {
                 EICErr eicErr = icSession.send(icm);
                 if (eicErr == EICErr.eErrSuccess) {
-                    log.info("Request has been successfully dispatched: "+icm);
+                    log.info("Request has been successfully dispatched: " + icm);
                 } else {
-                    log.error("Request dipatched with negative ack: "+ icm);
+                    log.error("Request dipatched with negative ack: " + icm);
                 }
             });
         }
     }
 
     /**
-     *
      * @param msgList
      * @return
      */
     protected boolean closeSession(List<ICMsg> msgList) {
-        if (msgList!=null && msgList.size()>0) {
-            msgList.forEach(msg->icSession.send(msg));
+        if (msgList != null && msgList.size() > 0) {
+            msgList.forEach(msg -> icSession.send(msg));
         }
         icSession.disconnect();
         try {

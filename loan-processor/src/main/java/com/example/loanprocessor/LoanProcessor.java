@@ -9,17 +9,17 @@ import org.springframework.stereotype.Component;
 @Component
 public interface LoanProcessor {
 
-  String APPLICATIONS_IN = "input";
-  String APPROVED_OUT = "approved";
-  String DECLINED_OUT = "declined";
+    String APPLICATIONS_IN = "input";
+    String APPROVED_OUT = "approved";
+    String DECLINED_OUT = "declined";
 
-  @Input(APPLICATIONS_IN)
-  SubscribableChannel sourceOfLoanApplications();
+    @Input(APPLICATIONS_IN)
+    SubscribableChannel sourceOfLoanApplications();
 
-  @Output(APPROVED_OUT)
-  MessageChannel approved();
+    @Output(APPROVED_OUT)
+    MessageChannel approved();
 
-  @Output(DECLINED_OUT)
-  MessageChannel declined();
+    @Output(DECLINED_OUT)
+    MessageChannel declined();
 
 }

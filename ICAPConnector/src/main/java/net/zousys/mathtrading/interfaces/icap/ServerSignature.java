@@ -1,6 +1,5 @@
 package net.zousys.mathtrading.interfaces.icap;
 
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.Builder;
 import lombok.Data;
 

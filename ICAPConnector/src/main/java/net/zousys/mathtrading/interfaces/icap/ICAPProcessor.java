@@ -6,11 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Message;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.File;
 import java.util.concurrent.Flow;
 
 @Slf4j
-public class ICAPProcessor implements Flow.Subscriber<Message>{
+public class ICAPProcessor implements Flow.Subscriber<Message> {
     @Getter
     @Setter
     private boolean active = true;

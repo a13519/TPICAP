@@ -47,6 +47,7 @@ public class ArchivingService {
             log.error("Archive caught exception: {}", e.getLocalizedMessage());
         }
     }
+
     /**
      * @param file
      * @throws IOException

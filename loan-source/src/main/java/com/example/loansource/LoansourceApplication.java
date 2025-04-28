@@ -15,7 +15,7 @@ public class LoansourceApplication {
     }
 
     @EventListener(ApplicationStartedEvent.class)
-    void logStartEvent(){
+    void logStartEvent() {
         log.info("The Loan-source Application has started...");
     }
 

@@ -9,7 +9,7 @@ import org.springframework.messaging.support.MessageBuilder;
 @SpringBootTest
 @EmbeddedKafka(
         partitions = 1,
-        brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" }
+        brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"}
 )
 @DirtiesContext
 public class SoruceModuleTest {

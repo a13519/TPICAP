@@ -1,4 +1,5 @@
 package net.zousys.mathtrading.interfaces.icap.service;
+
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.icap.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.icap.ICAPSource;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.HashSet;
@@ -30,13 +32,14 @@ public class PoolingMonitor {
     private ICAPSource icapSource;
     @Autowired
     private ICAPMessageRepo icapMessageRepo;
+
     /**
      *
      */
     @EventListener(ApplicationReadyEvent.class)
     public void startMonitoring() {
         if (poolingActive) {
-            CompletableFuture.runAsync(()-> {
+            CompletableFuture.runAsync(() -> {
                 try {
                     monitorFolder();
                 } catch (IOException | InterruptedException e) {
@@ -47,7 +50,6 @@ public class PoolingMonitor {
     }
 
     /**
-     *
      * @throws IOException
      * @throws InterruptedException
      */
@@ -92,7 +94,6 @@ public class PoolingMonitor {
     }
 
     /**
-     *
      * @param dir
      * @param watchService
      * @param registeredPaths

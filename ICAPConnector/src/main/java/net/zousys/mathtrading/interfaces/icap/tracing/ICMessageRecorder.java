@@ -3,19 +3,21 @@ package net.zousys.mathtrading.interfaces.icap.tracing;
 import com.icap.iConnect.srcMsgs.enums.EICErr;
 import com.icap.iConnect.srcMsgs.enums.EICMsgType;
 import com.icap.iConnect.srcMsgs.iCMsg.*;
-import com.icap.iConnect.srcMsgs.vectors.MarketIdVector;
 import com.icap.iConnect.srcMsgs.vectors.MarketPermsVector;
 import com.icap.iConnect.srcMsgs.vectors.MarketSubmarketPermsVector;
 import com.icap.iConnect.srcMsgs.vectors.SubmarketPermsVector;
 import com.icap.iConnect.srcSession.ICSession;
 import lombok.extern.slf4j.Slf4j;
+import net.zousys.mathtrading.interfaces.icap.ICAPMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
 
 /**
  *
@@ -27,42 +29,25 @@ public class ICMessageRecorder extends Recorder {
     public static final int ALL_MESSAGES = 1;
     public static final int LOG_MESSAGES = 2;
     public static final int LOG_OUTBOUND = 3;
-
+    @Value("${app.tracing.path.raw}")
     private String icmsgTraceRoot;
+    @Value("${app.tracing.message.level}")
     private int level;
-    private MessageLogGenerator messageLogGenerator;
-    private Path icmsgTraceRootPath;
-
-    /**
-     * Default Constructor. (Should not use)
-     */
     @Autowired
-    public ICMessageRecorder(
-            @Value("${app.tracing.path.raw}")
-            String icmsgTraceRoot,
-            @Value("${app.tracing.message.level}")
-            int level) {
-        this.level = level;
-        icmsgTraceRootPath = Paths.get(icmsgTraceRoot);
-    }
+    private ExecutorService recorderService;
+    @Autowired
+    private MessageLogGenerator messageLogGenerator;
 
     /**
      * Process messages from server.
      *
-     * @param msg     ICMsg
-     * @param session ICSession
+     * @param message     ICMsg
      * @return <tt>true</tt> if success
      */
-    public boolean record(ICMsg msg, ICSession session) {
+    public boolean record(ICAPMessage message) {
+        ICMsg msg = message.getIcMsg();
         if (level > 0) {
-            try {
-                recordMessage(msg, icmsgTraceRootPath);
-            } catch (IOException e) {
-                log.error("ICMsg was not stored {}.{}", msg.getMsgType(), msg.getSequenceNumber());
-                log.error("------------------");
-                log.error(msg.toString());
-                log.error("------------------");
-            }
+            recordMessage(msg, new File(icmsgTraceRoot).toPath(), recorderService);
         }
         boolean bSuccess = true;
         if (level >= LOG_MESSAGES) {
@@ -92,14 +77,14 @@ public class ICMessageRecorder extends Recorder {
                     break;
                 }
                 case EICMsgType.eMsgInvalid -> {
-                    ICMsgUnknown message = (ICMsgUnknown) msg;
+                    ICMsgUnknown unkmessage = (ICMsgUnknown) msg;
 
-                    if (EICErr.eErrMsgInvalid == message.getErrType()) {
+                    if (EICErr.eErrMsgInvalid == unkmessage.getErrType()) {
                         StringBuffer sBuff = new StringBuffer();
-                        sBuff.append("Invalid Msg received (MsgType: " + message.getOriginMsgType().getValue() + ")\n");
-                        sBuff.append("API Version: " + message.getSoftwareVersion() + "\n");
-                        sBuff.append("Desc: " + message.getDescription() + "\n");
-                        log.info(messageLogGenerator.generateLog(message, "Unknown", sBuff.toString()));
+                        sBuff.append("Invalid Msg received (MsgType: " + unkmessage.getOriginMsgType().getValue() + ")\n");
+                        sBuff.append("API Version: " + unkmessage.getSoftwareVersion() + "\n");
+                        sBuff.append("Desc: " + unkmessage.getDescription() + "\n");
+                        log.info(messageLogGenerator.generateLog(unkmessage, "Unknown", sBuff.toString()));
                     }
                     break;
                 }
@@ -115,7 +100,6 @@ public class ICMessageRecorder extends Recorder {
     }
 
     /**
-     *
      * @param msgRef
      */
     private void doMsgPositiveLogin(ICMsg msgRef) {
@@ -135,7 +119,7 @@ public class ICMessageRecorder extends Recorder {
                     ICMarketViewPerm ext = (ICMarketViewPerm) icMktPerm.getMarketPermsExtensionUnion().getExtension();
                     // Get the permission. 0 - not allowed, 1 - allowed.
                     byte perm = (byte) ext.getPerm();
-                    log.info("Market: {} - Type: {} - PERM: {}",marketId, permType, perm==1?"ALLOW":"NOT ALLOW");
+                    log.info("Market: {} - Type: {} - PERM: {}", marketId, permType, perm == 1 ? "ALLOW" : "NOT ALLOW");
                 }
             }
 

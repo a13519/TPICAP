@@ -6,28 +6,22 @@ import com.icap.iConnect.srcMsgs.iCMsg.ICMsgOrderBookRemove;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeBookRemove;
 import com.icap.iConnect.srcSession.ICCallback;
 import com.icap.iConnect.srcSession.ICSession;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Connector;
-import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.SessionException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Slf4j
 public class ICAPConnector extends Connector implements ICCallback {
     private ServerSignature serverSignature;
-    private ICAPSession icapSession;
+    private ICAPSessionManager icapSessionManager;
     private ICAPMessageRepo icapMessageRepo;
     private List<ICMsg> initMsgs;
     public Boolean started = false;
 
     /**
-     *
      * @param serverSignature
      */
     public ICAPConnector(ServerSignature serverSignature, ICAPMessageRepo icapMessageRepo, List<ICMsg> msgs) {
@@ -42,10 +36,10 @@ public class ICAPConnector extends Connector implements ICCallback {
      */
     @Override
     public void connect() {
-        icapSession = new ICAPSession(serverSignature, this);
+        icapSessionManager = new ICAPSessionManager(serverSignature, this);
         try {
-            icapSession.openSession();
-            icapSession.dispath(initMsgs);
+            icapSessionManager.openSession();
+            icapSessionManager.dispath(initMsgs);
             started = true;
         } catch (SessionException e) {
             throw new RuntimeException(e);
@@ -61,7 +55,7 @@ public class ICAPConnector extends Connector implements ICCallback {
         List<ICMsg> msgList = new ArrayList<>();
         msgList.add(new ICMsgOrderBookRemove());
         msgList.add(new ICMsgTradeBookRemove());
-        icapSession.closeSession(msgList);
+        icapSessionManager.closeSession(msgList);
     }
 
     /**
@@ -71,7 +65,7 @@ public class ICAPConnector extends Connector implements ICCallback {
     public void maintainSession() {
         if (started) {
             log.debug("Checking session...");
-            if (!icapSession.getIcSession().isConnected()) {
+            if (!icapSessionManager.getIcSession().isConnected()) {
                 log.warn("Session is broken, let's reconnect it...");
                 disconnect();
                 connect();

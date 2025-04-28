@@ -9,6 +9,7 @@ import net.zousys.mathtrading.interfaces.icap.ICAPConnector;
 import net.zousys.mathtrading.interfaces.icap.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.icap.ICAPProcessor;
 import net.zousys.mathtrading.interfaces.icap.ServerSignature;
+import net.zousys.mathtrading.interfaces.icap.tracing.ICMessageRecorder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,10 +24,6 @@ import java.util.concurrent.Flow;
 @Configuration
 public class InterfaceConfiguration {
 
-    @Value("${app.pool.connector}")
-    private int poolConnector;
-    @Value("${app.pool.processor}")
-    private int poolProcessor;
     @Value("${app.connection.host}")
     private String host;
     @Value("${app.connection.port}")
@@ -41,34 +38,6 @@ public class InterfaceConfiguration {
     private ICAPMessageRepo icapMessageRepo;
 
     /**
-     *
-     * @return
-     */
-    @Bean
-    public ExecutorService collectorService(){
-        return Executors.newFixedThreadPool(poolConnector);
-    }
-
-    /**
-     *
-     * @return
-     */
-    @Bean
-    public ExecutorService monitorService(){
-        return Executors.newFixedThreadPool(1);
-    }
-
-    /**
-     *
-     * @return
-     */
-    @Bean
-    public ExecutorService processorService(){
-        return Executors.newFixedThreadPool(poolProcessor);
-    }
-
-    /**
-     *
      * @return
      */
     @Bean
@@ -77,7 +46,6 @@ public class InterfaceConfiguration {
     }
 
     /**
-     *
      * @return
      */
     @Bean
@@ -88,8 +56,8 @@ public class InterfaceConfiguration {
         msgs.add(msg);
         return msgs;
     }
+
     /**
-     *
      * @return
      */
     @Bean
@@ -105,4 +73,5 @@ public class InterfaceConfiguration {
                 )
         };
     }
+
 }

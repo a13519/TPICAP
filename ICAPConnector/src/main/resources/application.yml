@@ -32,14 +32,15 @@ app:
     ssl: false
     host: 204.179.96.165
     port: 6264
-    # proxyHost:
-    # proxyPort:
+#    proxyHost: x
+#    proxyPort: 1
     key: devscrpstpic
     value: test
     refresh: 240000
   pool:
     connector: 1
     processor: 4
+    recorder: 5
   tracing:
     path:
       success: tracing/messages/success
@@ -52,12 +53,12 @@ app:
       path: archive
     message:
       level: 2          # 0: Nothing to trace (not recommended)
-                        # 1: record all messages
-                        # 2: log messages in DEBUG
-                        # 3: log outbound messages in DEBUG
+        # 1: record all messages
+        # 2: log messages in DEBUG
+      # 3: log outbound messages in DEBUG
       detailed: true    # to log message content
       housekeeping: 0       # 0: no housekeeping
-                            # n: days to clean
+      # n: days to clean
   pooling:
     active: true
     path: tracing/pooling              # pooling forlder for testing
