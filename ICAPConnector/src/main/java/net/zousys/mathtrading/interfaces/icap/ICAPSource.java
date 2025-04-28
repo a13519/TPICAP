@@ -32,19 +32,13 @@ public class ICAPSource implements Source {
     private int poolConnector;
     @Value("${app.pool.processor}")
     private int poolProcessor;
+    @Autowired
+    private ICAPMessageRepo icapMessageRepo;
 
     private ExecutorService collectorService;
     private ExecutorService processorService;
-    private ConcurrentLinkedQueue<Message> queue = new ConcurrentLinkedQueue();
     private Flow.Subscriber<Message> subscriber;
-
     private Connector[] connectors;
-    private Lock lock = new ReentrantLock();
-    private Condition write = lock.newCondition();
-    @Getter
-    private AtomicLong collected = new AtomicLong(0l);
-    @Getter
-    private AtomicLong consumed = new AtomicLong(0l);
 
     /**
      * @param connectors
@@ -71,29 +65,18 @@ public class ICAPSource implements Source {
     @Override
     public void startDeamon() {
         try {
-//            connectors[0].connect(queue);
+            connectors[0].connect();
         } catch (RuntimeException re) {
             log.error("Exception from connector connect: " + re.getLocalizedMessage());
         }
         IntStream.range(0, poolProcessor).forEach(i -> CompletableFuture.runAsync(() -> {
-
             while (true) {
-                lock.lock();
-                try {
-                    if (!queue.isEmpty()) {
-                        subscriber.onNext(queue.poll());
-                        consumed.addAndGet(1);
+                    if (!icapMessageRepo.isEmpty()) {
+                        subscriber.onNext(icapMessageRepo.poll());
                     } else {
-                        write.await();
+                        icapMessageRepo.await();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    log.error("Exception from taking message: " + e.getLocalizedMessage());
-                } finally {
-                    lock.unlock();
-                }
             }
-
         }, processorService));
 
     }
@@ -106,12 +89,4 @@ public class ICAPSource implements Source {
         Arrays.stream(connectors).forEach(connector -> connector.maintainSession());
     }
 
-    /**
-     * @param message
-     */
-    @Override
-    public void pollingPush(Message message) {
-        collected.addAndGet(1);
-        queue.add(message);
-    }
 }

@@ -42,9 +42,9 @@ app:
     processor: 4
   tracing:
     path:
-      success: tracing/success
-      failure: tracing/failure
-      pending: tracing/pending
+      success: tracing/messages/success
+      failure: tracing/messages/failure
+      pending: tracing/messages/pending
       raw: tracing/raw
     archiving:
       age: 30

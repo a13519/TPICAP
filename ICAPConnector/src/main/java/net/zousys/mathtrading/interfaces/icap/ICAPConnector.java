@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.SessionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,18 +21,26 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Slf4j
 public class ICAPConnector extends Connector implements ICCallback {
     private ServerSignature serverSignature;
-    @Getter
-    private ConcurrentLinkedQueue<ICAPMessage> queue;
     private ICAPSession icapSession;
+    private ICAPMessageRepo icapMessageRepo;
+
     public Boolean started = false;
 
-    public ICAPConnector(ServerSignature serverSignature) {
+    /**
+     *
+     * @param serverSignature
+     */
+    public ICAPConnector(ServerSignature serverSignature, ICAPMessageRepo icapMessageRepo) {
         super();
         this.serverSignature = serverSignature;
+        this.icapMessageRepo = icapMessageRepo;
     }
+
+    /**
+     *
+     */
     @Override
-    public void connect(ConcurrentLinkedQueue<? extends Message> queue) {
-        this.queue = (ConcurrentLinkedQueue<ICAPMessage>) queue;
+    public void connect() {
         icapSession = new ICAPSession(serverSignature, this);
         try {
             icapSession.openSession();
@@ -63,7 +73,7 @@ public class ICAPConnector extends Connector implements ICCallback {
             if (!icapSession.getIcSession().isConnected()) {
                 log.warn("Session is broken, let's reconnect it...");
                 disconnect();
-                connect(queue);
+                connect();
             }
         }
     }
@@ -81,7 +91,7 @@ public class ICAPConnector extends Connector implements ICCallback {
     @Override
     public void onData(ICMsg icMsg, ICSession icSession) {
         ICAPMessage icapMessage = new ICAPMessage(icMsg);
-        queue.add(icapMessage);
+        icapMessageRepo.push(icapMessage);
         log.info("IConnect API capture a message: {}", icapMessage.getId());
     }
 
