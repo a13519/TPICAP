@@ -38,9 +38,9 @@ public class ICMessageRecorder extends Recorder {
      */
     @Autowired
     public ICMessageRecorder(
-            @Value("${tracing.message.root}")
+            @Value("${app.tracing.path.raw}")
             String icmsgTraceRoot,
-            @Value("${tracing.message.level}")
+            @Value("${app.tracing.message.level}")
             int level) {
         this.level = level;
         icmsgTraceRootPath = Paths.get(icmsgTraceRoot);

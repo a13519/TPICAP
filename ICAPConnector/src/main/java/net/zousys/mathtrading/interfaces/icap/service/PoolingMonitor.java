@@ -19,9 +19,9 @@ import java.util.concurrent.ExecutorService;
 @Slf4j
 @Component
 public class PoolingMonitor {
-    @Value("${pooling.active}")
+    @Value("${app.pooling.active}")
     private boolean poolingActive;
-    @Value("${pooling.path}")
+    @Value("${app.pooling.path}")
     private String poolingPath;
     @Autowired
     private ExecutorService monitorService;

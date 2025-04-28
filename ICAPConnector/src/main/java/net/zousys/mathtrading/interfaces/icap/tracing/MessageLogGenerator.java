@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @Component
 public class MessageLogGenerator {
-    @Value("${tracing.message.detailed}")
+    @Value("${app.tracing.message.detailed}")
     private boolean detailed;
 
     /**

@@ -20,24 +20,25 @@ import java.util.zip.ZipOutputStream;
 @Service
 @EnableScheduling
 public class ArchivingService {
-    @Value("${app.trace.path.success}")
+    @Value("${app.tracing.path.success}")
     private String sucessPath;
-    @Value("${app.trace.path.pending}")
+    @Value("${app.tracing.path.pending}")
     private String pendingPath;
-    @Value("${app.trace.path.failure}")
+    @Value("${app.tracing.path.failure}")
     private String failurePath;
+    @Value("${app.tracing.archiving.path}")
     private String archiverPath;
     private int threshold = 0;
 
-    private File success = new File(sucessPath);
-    private File pending = new File(pendingPath);
-    private File failure = new File(failurePath);
 
     /**
      *
      */
     @Scheduled(cron = "0 0 2 * * ?")
     public void archiveAll() {
+        File success = new File(sucessPath);
+        File pending = new File(pendingPath);
+        File failure = new File(failurePath);
         try {
             archiveMessageFiles(success);
             archiveMessageFiles(pending);

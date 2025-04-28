@@ -26,9 +26,6 @@ public class PTFService {
     @Value("${app.tracing.path.pending}")
     private String pending;
 
-    private File successFile = new File(success);
-    private File failureFile = new File(failure);
-    private File pendingFile = new File(pending);
     /**
      *
      */
@@ -53,6 +50,11 @@ public class PTFService {
     @Scheduled(fixedRateString = "${app.trace.archiving.interval:86400000}")
     private void archiving() {
         long age = ageInDays * 24 * 60 * 60 * 1000L;
+
+        File successFile = new File(success);
+        File failureFile = new File(failure);
+        File pendingFile = new File(pending);
+
         archiveFile(successFile, age);
         archiveFile(failureFile, age);
         archiveFile(pendingFile, age);

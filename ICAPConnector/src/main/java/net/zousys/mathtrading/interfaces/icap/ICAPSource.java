@@ -47,7 +47,6 @@ public class ICAPSource implements Source {
     private AtomicLong consumed = new AtomicLong(0l);
 
     /**
-     *
      * @param connectors
      * @param collectorService
      * @param processorService
@@ -72,23 +71,29 @@ public class ICAPSource implements Source {
     @Override
     public void startDeamon() {
         try {
-            connectors[0].connect(queue);
+//            connectors[0].connect(queue);
         } catch (RuntimeException re) {
-            log.error("Exception from connector connect: "+ re.getLocalizedMessage());
+            log.error("Exception from connector connect: " + re.getLocalizedMessage());
         }
-        IntStream.range(0, poolProcessor).forEach(i -> CompletableFuture.runAsync(()-> {
-            try {
-                while(true) {
+        IntStream.range(0, poolProcessor).forEach(i -> CompletableFuture.runAsync(() -> {
+
+            while (true) {
+                lock.lock();
+                try {
                     if (!queue.isEmpty()) {
                         subscriber.onNext(queue.poll());
                         consumed.addAndGet(1);
                     } else {
                         write.await();
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.error("Exception from taking message: " + e.getLocalizedMessage());
+                } finally {
+                    lock.unlock();
                 }
-            } catch (Exception e) {
-                log.error("Exception from taking message: "+ e.getLocalizedMessage());
             }
+
         }, processorService));
 
     }
@@ -102,7 +107,6 @@ public class ICAPSource implements Source {
     }
 
     /**
-     *
      * @param message
      */
     @Override

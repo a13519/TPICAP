@@ -14,16 +14,16 @@ public class ICAPProcessor implements Flow.Subscriber<Message>{
     @Getter
     @Setter
     private boolean active = true;
-    @Value("${app.trace.path.success}")
+    @Value("${app.tracing.path.success}")
     private String sucessPath;
-    @Value("${app.trace.path.pending}")
+    @Value("${app.tracing.path.pending}")
     private String pendingPath;
-    @Value("${app.trace.path.failure}")
+    @Value("${app.tracing.path.failure}")
     private String failurePath;
-
-    private File success = new File(sucessPath);
-    private File pending = new File(pendingPath);
-    private File failure = new File(failurePath);
+//
+//    private File success = new File(sucessPath);
+//    private File pending = new File(pendingPath);
+//    private File failure = new File(failurePath);
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {

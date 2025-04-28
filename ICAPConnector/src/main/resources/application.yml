@@ -4,6 +4,25 @@ spring:
     name: tpicap-interface
     lifecycle:
       timeout-per-shutdown-phase: 30s
+  datasource:
+    url: jdbc:h2:file:./data/mngdb;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  sql:
+    init:
+      mode: never
 
 server:
   port: 11003
@@ -23,13 +42,14 @@ app:
     processor: 4
   tracing:
     path:
-      success: /
-      failure: /
-      pending: /
-      raw: /
+      success: tracing/success
+      failure: tracing/failure
+      pending: tracing/pending
+      raw: tracing/raw
     archiving:
       age: 30
       interval: 86400000
+      path: archive
     message:
       level: 2          # 0: Nothing to trace (not recommended)
                         # 1: record all messages
@@ -38,10 +58,9 @@ app:
       detailed: true    # to log message content
       housekeeping: 0       # 0: no housekeeping
                             # n: days to clean
-
-pooling:
-  active: true
-  path: /cba
+  pooling:
+    active: true
+    path: tracing/pooling              # pooling forlder for testing
 
 management:
   endpoints:
