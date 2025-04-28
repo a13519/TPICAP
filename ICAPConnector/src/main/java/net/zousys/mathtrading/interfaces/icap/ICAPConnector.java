@@ -1,9 +1,11 @@
 package net.zousys.mathtrading.interfaces.icap;
 
+import com.icap.iConnect.srcMsgs.enums.EICErr;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgOrderBookRemove;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeBookRemove;
 import com.icap.iConnect.srcSession.ICCallback;
+import com.icap.iConnect.srcSession.ICSession;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Connector;
@@ -64,5 +66,27 @@ public class ICAPConnector extends Connector implements ICCallback {
                 connect(queue);
             }
         }
+    }
+
+    @Override
+    public void onConnect(ICSession icSession) {
+        log.info("IConnect API Version: {}", icSession.getSoftwareVersion());
+    }
+
+    @Override
+    public void onDisconnect(boolean b, ICSession icSession) {
+        log.info("IConnect API disconnected");
+    }
+
+    @Override
+    public void onData(ICMsg icMsg, ICSession icSession) {
+        ICAPMessage icapMessage = new ICAPMessage(icMsg);
+        queue.add(icapMessage);
+        log.info("IConnect API capture a message: {}", icapMessage.getId());
+    }
+
+    @Override
+    public void onError(EICErr eicErr, ICSession icSession) {
+        log.error("IConnect API on error calling back: {}", eicErr);
     }
 }
