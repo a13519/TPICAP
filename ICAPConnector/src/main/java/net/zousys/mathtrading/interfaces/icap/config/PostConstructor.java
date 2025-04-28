@@ -20,6 +20,7 @@ public class PostConstructor {
     private String pooling;
     @Value("${app.tracing.archiving.path}")
     private String archiverPath;
+
     @PostConstruct
     public void construct() {
         File successFile = new File(success);

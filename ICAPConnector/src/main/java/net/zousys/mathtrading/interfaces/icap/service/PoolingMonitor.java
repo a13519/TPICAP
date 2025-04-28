@@ -1,5 +1,6 @@
 package net.zousys.mathtrading.interfaces.icap.service;
 import lombok.extern.slf4j.Slf4j;
+import net.zousys.mathtrading.interfaces.icap.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.icap.ICAPSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +28,8 @@ public class PoolingMonitor {
     private ExecutorService monitorService;
     @Autowired
     private ICAPSource icapSource;
-
+    @Autowired
+    private ICAPMessageRepo icapMessageRepo;
     /**
      *
      */
@@ -72,6 +74,8 @@ public class PoolingMonitor {
                 if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
                     if (Files.isRegularFile(fullPath)) {
                         log.info("New file detected: " + fullPath);
+                        icapMessageRepo.push(null);
+                        // TODO
                     } else if (Files.isDirectory(fullPath) && !registeredPaths.contains(fullPath)) {
                         log.warn("New folder detected: " + fullPath);
                         registerDirectory(fullPath, watchService, registeredPaths);

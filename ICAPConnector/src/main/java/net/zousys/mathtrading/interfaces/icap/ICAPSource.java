@@ -56,7 +56,6 @@ public class ICAPSource implements Source {
         this.collectorService = collectorService;
         this.processorService = processorService;
         this.subscriber = subscriber;
-        startDeamon();
     }
 
     /**

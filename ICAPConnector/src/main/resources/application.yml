@@ -31,7 +31,7 @@ app:
   connection:
     ssl: false
     host: 204.179.96.165
-    port: 6254
+    port: 6264
     # proxyHost:
     # proxyPort:
     key: devscrpstpic

@@ -23,17 +23,18 @@ public class ICAPConnector extends Connector implements ICCallback {
     private ServerSignature serverSignature;
     private ICAPSession icapSession;
     private ICAPMessageRepo icapMessageRepo;
-
+    private List<ICMsg> initMsgs;
     public Boolean started = false;
 
     /**
      *
      * @param serverSignature
      */
-    public ICAPConnector(ServerSignature serverSignature, ICAPMessageRepo icapMessageRepo) {
+    public ICAPConnector(ServerSignature serverSignature, ICAPMessageRepo icapMessageRepo, List<ICMsg> msgs) {
         super();
         this.serverSignature = serverSignature;
         this.icapMessageRepo = icapMessageRepo;
+        this.initMsgs = msgs;
     }
 
     /**
@@ -44,7 +45,7 @@ public class ICAPConnector extends Connector implements ICCallback {
         icapSession = new ICAPSession(serverSignature, this);
         try {
             icapSession.openSession();
-            icapSession.dispath(new ArrayList<ICMsg>());
+            icapSession.dispath(initMsgs);
             started = true;
         } catch (SessionException e) {
             throw new RuntimeException(e);
