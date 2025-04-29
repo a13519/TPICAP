@@ -52,13 +52,15 @@ app:
       interval: 86400000
       path: archive
     message:
-      level: 2          # 0: Nothing to trace (not recommended)
-        # 1: record all messages
-        # 2: log messages in DEBUG
-      # 3: log outbound messages in DEBUG
-      detailed: true    # to log message content
+      serialize-level: ALL            # ALL: business message and session message
+                                      # BUSINESS: business message only
+      content-level:   OUTBOUND       # NONE: Nothing to trace (not recommended)
+                                      # BUSINESS: businesss only
+                                      # INBOUND: inbound message only
+                                      # OUTBOUND: includes outbound
+      detailed: true        # to log message content
       housekeeping: 0       # 0: no housekeeping
-      # n: days to clean
+                            # n: days to clean
   pooling:
     active: true
     path: tracing/pooling              # pooling forlder for testing

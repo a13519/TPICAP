@@ -1,11 +1,24 @@
 package net.zousys.mathtrading.interfaces.icap.config;
 
+import com.icap.iConnect.srcMsgs.enums.EICMsgType;
+import lombok.Data;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+@Slf4j
 @Configuration
 public class EssentialConfig {
     @Value("${app.pool.connector}")
@@ -43,4 +56,29 @@ public class EssentialConfig {
         return Executors.newFixedThreadPool(poolProcessor);
     }
 
+    @Bean
+    public Set<String> bizTypes() {
+        Properties properties = new Properties();
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("business-types.properties")) {
+            if (inputStream == null) {
+                log.error("File not found: business-types.properties");
+            }
+            properties.load(inputStream);
+            String types = properties.getProperty("types");
+            return new HashSet<>(
+                    Arrays.stream(types.split(","))
+                            .map(String::trim).toList()
+            );
+        } catch (Exception e) {
+            log.error("Error thrown when loading business message types: " + e.getLocalizedMessage());
+        }
+        return new HashSet<>();
+    }
+    @Data
+    @Component
+    @ConfigurationProperties(prefix = "app.tracing.message")
+    public static class EnumConfig {
+        private Constants.ContentLevel contentLevel;
+        private Constants.SerializeLevel serializeLevel;
+    }
 }

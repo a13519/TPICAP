@@ -44,7 +44,7 @@ public class ICAPMessageTest {
         lu.dump(sb);
         System.out.println(sb);
         assert(lu!=null);
-        assert(lu.getMsgType().equals(EICMsgType.eMsgPositive));
+        assert(lu.getMsgType().equals(EICMsgType.valueOf().eMsgTradeBookUpdate.eMsgPositive));
         assert(lu.getFirmId().equals("000001"));
         assert(lu.getConditionSubrecord().getConditionVector().size()==0);
     }
