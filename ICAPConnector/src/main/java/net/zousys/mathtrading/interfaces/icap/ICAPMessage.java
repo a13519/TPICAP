@@ -1,19 +1,22 @@
 package net.zousys.mathtrading.interfaces.icap;
 
-import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
+import com.icap.iConnect.srcMsgs.iCMsg.*;
 import com.icap.iConnect.srcMsgs.iCUtils.ICMessageBuffer;
 import lombok.Getter;
 import net.zousys.mathtrading.interfaces.Message;
+import net.zousys.mathtrading.interfaces.icap.tracing.RecordableMessage;
+import net.zousys.mathtrading.interfaces.util.FileReader;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  *
  */
-@Getter
-public class ICAPMessage implements Message {
-    private ICMsg icMsg;
+public class ICAPMessage extends RecordableMessage implements Message {
 
     public ICAPMessage(ICMsg icMsg) {
-        this.icMsg = icMsg;
+        super(icMsg);
     }
 
     @Override
@@ -23,27 +26,25 @@ public class ICAPMessage implements Message {
 
     @Override
     public String getType() {
-        return "";
+        return icMsg.getMsgType().name();
     }
 
     @Override
     public String getId() {
-        return "";
+        return icMsg.getFirmId();
     }
 
     /**
-     * @param playload
+     * @param payload
      * @return
      */
-    public static Message form(byte[] playload) {
-        if (playload != null) {
-            ICMessageBuffer icMessageBuffer = new ICMessageBuffer();
-            icMessageBuffer.put(playload);
-            ICMsg icMsg = new ICMsg();
-            icMsg.unpack(icMessageBuffer);
-            return new ICAPMessage(icMsg);
+    public static ICAPMessage form(byte[] payload) {
+        if (payload != null) {
+            ICMsg msg = RecordableMessage.parse(payload);
+            return new ICAPMessage(msg);
         } else {
             return new ICAPMessage(new ICMsg());
         }
     }
+
 }

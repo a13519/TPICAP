@@ -42,8 +42,9 @@ public class ICAPSessionManager {
                 icCallback,
                 serverSignature.isSsl());
         icSession.setReconnectInterval(0);
-        icSession.setCheckHeartbeatTimeout(30 * 1000);
+        icSession.setCheckHeartbeatTimeout(130 * 1000);
         icSession.setCompression(EICCompressionType.eCompressedData);
+
         if (proxyHost!=null&&proxyPort!=-1) {
             icSession.setProxyHostPort(proxyHost, proxyPort);
         }

@@ -1,8 +1,10 @@
 package net.zousys.mathtrading.interfaces.icap.service;
 
 import lombok.extern.slf4j.Slf4j;
+import net.zousys.mathtrading.interfaces.icap.ICAPMessage;
 import net.zousys.mathtrading.interfaces.icap.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.icap.ICAPSource;
+import net.zousys.mathtrading.interfaces.util.FileReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -39,13 +41,13 @@ public class PoolingMonitor {
     @EventListener(ApplicationReadyEvent.class)
     public void startMonitoring() {
         if (poolingActive) {
-            CompletableFuture.runAsync(() -> {
+//            CompletableFuture.runAsync(() -> {
                 try {
                     monitorFolder();
                 } catch (IOException | InterruptedException e) {
                     System.err.println("Error monitoring folder: " + e.getMessage());
                 }
-            }, monitorService);
+//            }, monitorService);
         }
     }
 
@@ -73,11 +75,12 @@ public class PoolingMonitor {
                 WatchEvent<Path> ev = (WatchEvent<Path>) event;
                 Path fileName = ev.context();
                 Path fullPath = ((Path) key.watchable()).resolve(fileName);
-                if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                if (kind == StandardWatchEventKinds.ENTRY_CREATE
+                        || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                     if (Files.isRegularFile(fullPath)) {
                         log.info("New file detected: " + fullPath);
-                        icapMessageRepo.push(null);
-                        // TODO
+                        icapMessageRepo.push(ICAPMessage.form(FileReader.readFileToBytes(fullPath)));
+                        Files.delete(fullPath);
                     } else if (Files.isDirectory(fullPath) && !registeredPaths.contains(fullPath)) {
                         log.warn("New folder detected: " + fullPath);
                         registerDirectory(fullPath, watchService, registeredPaths);
