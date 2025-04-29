@@ -59,4 +59,15 @@ public class ICAPMessageTest {
         assert(lu.getMsgType().equals(EICMsgType.eMsgHeartbeat));
         assert(lu.getFirmId().equals("000001"));
     }
+    @Test
+    public void testPLFileData() throws IOException {
+        byte[] bb = FileReader.readFileToBytes(getClass().getClassLoader().getResourceAsStream("1745911349680_eMsgPositiveLogin.irm"));
+        ICMsgPositiveLogin lu = ICAPMessage.parse(bb);
+        StringBuffer sb = new StringBuffer();
+        lu.dump(sb);
+        System.out.println(sb);
+        assert(lu!=null);
+        assert(lu.getMsgType().equals(EICMsgType.eMsgPositiveLogin));
+        assert(lu.getFirmId().equals("000001"));
+    }
 }
