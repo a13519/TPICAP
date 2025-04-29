@@ -47,4 +47,10 @@ public class ICAPMessage extends RecordableMessage implements Message {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        icMsg.dump(sb);
+        return sb.toString();
+    }
 }

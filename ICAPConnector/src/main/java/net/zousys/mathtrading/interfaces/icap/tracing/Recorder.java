@@ -23,52 +23,31 @@ public class Recorder {
         return LocalDate.now().format(formatter);
     }
 
-    protected static final String messageId(long time, ICMsg icMsg) {
-        return time + "_" + icMsg.getMsgType();
+    protected static final String messageId(long time, String type) {
+        return time + "_" + type;
     }
 
     /**
-     * @param icMsg
+     *
+     * @param message
      * @param root
-     * @throws IOException
+     * @param executorService
      */
-    public static final void recordMessage(ICMsg icMsg, Path root, ExecutorService executorService) {
+    public static final void recordMessage(ICAPMessage message, Path root, ExecutorService executorService) {
         CompletableFuture.runAsync(() -> {
             try {
                 Path subroot = root.resolve(dateTag());
                 Files.createDirectories(subroot);
                 long time = System.currentTimeMillis();
-                Path filepath = subroot.resolve(messageId(time, icMsg));
-
-                EICMsgType type = icMsg.getMsgType();
-                ICMessageBuffer icMessageBuffer = new ICMessageBuffer();
-                ((ICMsgPositiveLogin)icMsg).pack(icMessageBuffer);
-                byte[] b1 = icMessageBuffer.array();
-
-                StringBuffer sb = new StringBuffer();
-                icMsg.dump(sb);
-                System.out.println(sb);
-
-                ICMessageBuffer icMessageBuffer2 = new ICMessageBuffer();
-                icMessageBuffer2.put(b1);
-                icMessageBuffer2.flip();
-                ICMsgPositiveLogin icMsg2 = new ICMsgPositiveLogin();
-                icMsg2.unpack(icMessageBuffer2);
-
-                StringBuffer sb2 = new StringBuffer();
-                icMsg2.dump(sb2);
-                System.out.println(sb2);
-
-
-
-                Files.write(filepath, icMessageBuffer.array()); // Write byte array to file
+                Path filepath = subroot.resolve(messageId(time, message.getType())+".irm");
+                Files.write(filepath, message.serialize()); // Write byte array to file
                 filepath.toFile().setLastModified(time);
                 log.debug("Message was recorded: " + filepath);
             } catch (IOException e) {
                 log.error("Record ICSMsg error: " + e.getLocalizedMessage());
-                log.error("ICMsg was not stored {}.{}", icMsg.getMsgType(), icMsg.getSequenceNumber());
+                log.error("ICMsg was not stored {}.{}", message.getType(), message.getIcMsg().getSequenceNumber());
                 log.error("------------------");
-                log.error(icMsg.toString());
+                log.error(message.toString());
                 log.error("------------------");
             }
         }, executorService);

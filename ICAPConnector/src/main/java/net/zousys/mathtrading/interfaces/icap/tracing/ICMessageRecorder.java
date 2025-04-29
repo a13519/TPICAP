@@ -41,43 +41,43 @@ public class ICMessageRecorder extends Recorder {
     /**
      * Process messages from server.
      *
-     * @param message     ICMsg
+     * @param msg     ICMsg
      * @return <tt>true</tt> if success
      */
-    public boolean record(ICAPMessage message) {
-        ICMsg msg = message.getIcMsg();
+    public boolean record(ICAPMessage msg) {
+
         if (level > 0) {
             recordMessage(msg, new File(icmsgTraceRoot).toPath(), recorderService);
         }
         boolean bSuccess = true;
         if (level >= LOG_MESSAGES) {
-            EICMsgType msgType = msg.getMsgType();
+            EICMsgType msgType = msg.icMsg.getMsgType();
             switch (msgType) {
                 case EICMsgType.eMsgHeartbeat -> {
                     break;
                 }
                 case EICMsgType.eMsgPositive -> {
-                    log.debug(messageLogGenerator.generateLog((ICMsgPositive) msg, "Pos. Resp"));
+                    log.debug(messageLogGenerator.generateLog((ICMsgPositive) msg.icMsg, "Pos. Resp"));
                     break;
                 }
                 case EICMsgType.eMsgNegative -> {
-                    log.info(messageLogGenerator.generateLog((ICMsgNegative) msg, "Neg. Resp", ((ICMsgNegative) msg).getDescription()));
+                    log.info(messageLogGenerator.generateLog((ICMsgNegative) msg.icMsg, "Neg. Resp", ((ICMsgNegative) msg.icMsg).getDescription()));
                     break;
                 }
                 case EICMsgType.eMsgPositiveLogin -> {
-                    doMsgPositiveLogin(msg);
+                    doMsgPositiveLogin(msg.icMsg);
                     break;
                 }
                 case EICMsgType.eMsgMessageLogUpdate -> {
-                    log.debug(messageLogGenerator.generateLog((ICMsgLogUpdate) msg, "LogUpdate", ((ICMsgLogUpdate) msg).getMessage()));
+                    log.debug(messageLogGenerator.generateLog((ICMsgLogUpdate) msg.icMsg, "LogUpdate", ((ICMsgLogUpdate) msg.icMsg).getMessage()));
                     break;
                 }
                 case EICMsgType.eMsgClearBook -> {
-                    log.info(messageLogGenerator.generateLog((ICMsgClearBookUpdate) msg, "ClearBook"));
+                    log.info(messageLogGenerator.generateLog((ICMsgClearBookUpdate) msg.icMsg, "ClearBook"));
                     break;
                 }
                 case EICMsgType.eMsgInvalid -> {
-                    ICMsgUnknown unkmessage = (ICMsgUnknown) msg;
+                    ICMsgUnknown unkmessage = (ICMsgUnknown) msg.icMsg;
 
                     if (EICErr.eErrMsgInvalid == unkmessage.getErrType()) {
                         StringBuffer sBuff = new StringBuffer();
@@ -90,8 +90,8 @@ public class ICMessageRecorder extends Recorder {
                 }
                 default -> {
                     StringBuffer sBuff = new StringBuffer();
-                    sBuff.append("Msg received (MsgType: " + msg.getMsgType().getValue() + ")\n");
-                    log.info(messageLogGenerator.generateLog(msg, sBuff.toString()));
+                    sBuff.append("Msg received (MsgType: " + msg.getType() + ")\n");
+                    log.info(messageLogGenerator.generateLog(msg.icMsg, sBuff.toString()));
                     bSuccess = false;
                 }
             }

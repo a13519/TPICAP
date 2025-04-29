@@ -5,13 +5,25 @@ import com.icap.iConnect.srcMsgs.iCMsg.*;
 import com.icap.iConnect.srcMsgs.iCUtils.ICMessageBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.zousys.mathtrading.interfaces.util.FileReader;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 @AllArgsConstructor
 public class  RecordableMessage {
     @Getter
     protected ICMsg icMsg;
 
+    /**
+     *
+     * @param name
+     * @return
+     * @param <T>
+     * @throws IOException
+     */
+    public static <T extends ICMsg> T parse(String name) throws IOException {
+        return parse(FileReader.readFileToBytes(name));
+    }
     /**
      *
      * @param data
@@ -22,6 +34,7 @@ public class  RecordableMessage {
         byte type = bb.get();
         ICMsg icMsgr = new ICMsg();
         icMsgr.setMsgType(EICMsgType.getName((int)type));
+        bb.position(1);
         ByteBuffer sub = bb.slice();
         ICMessageBuffer mb = new ICMessageBuffer(sub);
         return (T) new RecordableMessage(icMsgr).getICMessage(true);
@@ -79,14 +92,21 @@ public class  RecordableMessage {
     }
 
 
+        public static void main(String[] args) throws IOException {
+            // Example ByteBuffer
+            ByteBuffer buffer = ByteBuffer.wrap(FileReader.readFileToBytes("/Users/songzou/Documents/IdeaProjects/TPICAP/ICAPConnector/src/test/resources/1745911349680_eMsgPositiveLogin.irm"));
 
-    public static void main(String[] args) {
-        ICMsgLogUpdate mlu = new ICMsgLogUpdate();
-        ICMsgClearBookUpdate mcbu = new ICMsgClearBookUpdate();
-        byte[] b1 = new RecordableMessage(mlu).serialize();
-        byte[] b2 = new RecordableMessage(mcbu).serialize();
-        byte[] b3 = new RecordableMessage(new ICMsg()).serialize();
-        int s = 0;
-    }
+            // Skip the first byte (move position to index 1)
+            buffer.position(1);
+
+            // Create a new ByteBuffer from the current position to the end
+            ByteBuffer subBuffer = buffer.slice();
+            buffer.flip();
+            // Print the contents of the subBuffer
+            while (subBuffer.hasRemaining()) {
+                System.out.println(subBuffer.get());
+            }
+        }
+
 
 }
