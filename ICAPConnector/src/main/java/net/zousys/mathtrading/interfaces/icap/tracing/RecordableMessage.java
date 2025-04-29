@@ -13,7 +13,8 @@ import java.nio.ByteBuffer;
 public class  RecordableMessage {
     @Getter
     protected ICMsg icMsg;
-
+    @Getter
+    protected long time;
     /**
      *
      * @param name
@@ -36,8 +37,7 @@ public class  RecordableMessage {
         icMsgr.setMsgType(EICMsgType.getName((int)type));
         bb.position(1);
         ByteBuffer sub = bb.slice();
-        ICMessageBuffer mb = new ICMessageBuffer(sub);
-        return (T) new RecordableMessage(icMsgr).getICMessage(true);
+        return (T) new RecordableMessage(icMsgr, System.currentTimeMillis()).getICMessage(true);
     }
 
     /**
@@ -45,9 +45,10 @@ public class  RecordableMessage {
      * @return
      */
     public byte[] serialize() {
-        ByteBuffer bb = ByteBuffer.allocate(201);
+        ByteBuffer mbb = getByteBuffer();
+        ByteBuffer bb = ByteBuffer.allocate(mbb.capacity()+1);
         bb.put((byte)icMsg.getMsgType().getValue());
-        bb.put(getByteBuffer());
+        bb.put(mbb);
         return bb.array();
     }
 

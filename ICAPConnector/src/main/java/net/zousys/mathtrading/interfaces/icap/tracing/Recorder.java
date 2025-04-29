@@ -34,15 +34,14 @@ public class Recorder {
      * @param executorService
      */
     public static final void recordMessage(ICAPMessage message, Path root, ExecutorService executorService) {
-        CompletableFuture.runAsync(() -> {
+//        CompletableFuture.runAsync(() -> {
             try {
                 Path subroot = root.resolve(dateTag());
                 Files.createDirectories(subroot);
-                long time = System.currentTimeMillis();
-                Path filepath = subroot.resolve(messageId(time, message.getType())+".irm");
+                Path filepath = subroot.resolve(messageId(message.getTime(), message.getType())+".irm");
                 Files.write(filepath, message.serialize()); // Write byte array to file
-                filepath.toFile().setLastModified(time);
-                log.debug("Message was recorded: " + filepath);
+                filepath.toFile().setLastModified(message.getTime());
+                log.info("Message was recorded: " + filepath);
             } catch (IOException e) {
                 log.error("Record ICSMsg error: " + e.getLocalizedMessage());
                 log.error("ICMsg was not stored {}.{}", message.getType(), message.getIcMsg().getSequenceNumber());
@@ -50,7 +49,7 @@ public class Recorder {
                 log.error(message.toString());
                 log.error("------------------");
             }
-        }, executorService);
+//        }, executorService);
     }
 
 

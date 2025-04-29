@@ -28,7 +28,8 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
     @Override
     public void onNext(Message message) {
         if (active) {
-
+            log.info("PROCESS ------ {}", message.getId());
+            log.info("PROCESS > "+message.toString());
         }
     }
 

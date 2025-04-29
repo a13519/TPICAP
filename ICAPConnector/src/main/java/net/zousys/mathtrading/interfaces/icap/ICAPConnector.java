@@ -22,14 +22,23 @@ public class ICAPConnector extends Connector implements ICCallback {
     private ServerSignature serverSignature;
     private ICAPSessionManager icapSessionManager;
     private ICAPMessageRepo icapMessageRepo;
-    private List<ICMsg> initMsgs;
+    private List<ICAPMessage> initMsgs;
     public Boolean started = false;
 
     /**
+     *
+     * @param icapSessionManager
      * @param serverSignature
+     * @param icapMessageRepo
+     * @param msgs
      */
-    public ICAPConnector(ServerSignature serverSignature, ICAPMessageRepo icapMessageRepo, List<ICMsg> msgs) {
+    public ICAPConnector(
+            ICAPSessionManager icapSessionManager,
+            ServerSignature serverSignature,
+            ICAPMessageRepo icapMessageRepo,
+            List<ICAPMessage> msgs) {
         super();
+        this.icapSessionManager = icapSessionManager;
         this.serverSignature = serverSignature;
         this.icapMessageRepo = icapMessageRepo;
         this.initMsgs = msgs;
@@ -40,9 +49,8 @@ public class ICAPConnector extends Connector implements ICCallback {
      */
     @Override
     public void connect() {
-        icapSessionManager = new ICAPSessionManager(serverSignature, this);
         try {
-            icapSessionManager.openSession();
+            icapSessionManager.openSession(serverSignature, this);
             icapSessionManager.dispath(initMsgs);
             started = true;
         } catch (SessionException e) {
@@ -90,8 +98,8 @@ public class ICAPConnector extends Connector implements ICCallback {
     @Override
     public void onData(ICMsg icMsg, ICSession icSession) {
         ICAPMessage icapMessage = new ICAPMessage(icMsg);
-        icapMessageRepo.push(icapMessage);
         log.info("IConnect API capture a message: {}", icapMessage.getId());
+        icapMessageRepo.push(icapMessage);
     }
 
     @Override

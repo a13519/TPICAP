@@ -9,31 +9,42 @@ import com.icap.iConnect.srcSession.ICSessionMngr;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.SessionException;
+import net.zousys.mathtrading.interfaces.icap.config.Constants;
+import net.zousys.mathtrading.interfaces.icap.config.EssentialConfig;
+import net.zousys.mathtrading.interfaces.icap.tracing.Recorder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 @Slf4j
+@Component
 public class ICAPSessionManager {
     @Value("${app.connection.proxyHost:null}")
     private String proxyHost;
     @Value("${app.connection.proxyPort:-1}")
     private int proxyPort;
-
+    @Value("${app.tracing.path.raw}")
+    private String icmsgTraceRoot;
+    @Autowired
+    private EssentialConfig.EnumConfig enumConfig;
+    @Autowired
+    private ExecutorService recorderService;
     @Getter
     private ICSession icSession;
     private ServerSignature serverSignature;
     private ICCallback icCallback;
 
-    protected ICAPSessionManager(ServerSignature serverSignature, ICCallback icCallback) {
-        this.serverSignature = serverSignature;
-        this.icCallback = icCallback;
-    }
-
     /**
      * @throws SessionException
      */
-    protected void openSession() throws SessionException {
+    protected void openSession(ServerSignature serverSignature, ICCallback icCallback) throws SessionException {
+        this.serverSignature = serverSignature;
+        this.icCallback = icCallback;
         icSession = ICSessionMngr.getMngr().createSession(
                 serverSignature.getKey(),
                 serverSignature.getValue(),
@@ -72,10 +83,13 @@ public class ICAPSessionManager {
     /**
      * @param vRequests
      */
-    protected void dispath(List<ICMsg> vRequests) {
+    protected void dispath(List<ICAPMessage> vRequests) {
         if (vRequests != null) {
             vRequests.forEach(icm -> {
-                EICErr eicErr = icSession.send(icm);
+                EICErr eicErr = icSession.send(icm.getIcMsg());
+                if (enumConfig.getContentLevel()== Constants.ContentLevel.OUTBOUND) {
+                    Recorder.recordMessage(icm, new File(icmsgTraceRoot).toPath(), recorderService);
+                }
                 if (eicErr == EICErr.eErrSuccess) {
                     log.info("Request has been successfully dispatched: " + icm);
                 } else {

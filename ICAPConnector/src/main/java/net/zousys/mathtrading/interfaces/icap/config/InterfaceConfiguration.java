@@ -5,10 +5,7 @@ import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeRequest;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.Message;
-import net.zousys.mathtrading.interfaces.icap.ICAPConnector;
-import net.zousys.mathtrading.interfaces.icap.ICAPMessageRepo;
-import net.zousys.mathtrading.interfaces.icap.ICAPProcessor;
-import net.zousys.mathtrading.interfaces.icap.ServerSignature;
+import net.zousys.mathtrading.interfaces.icap.*;
 import net.zousys.mathtrading.interfaces.icap.tracing.ICMessageRecorder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +33,8 @@ public class InterfaceConfiguration {
     private Boolean ssl;
     @Autowired
     private ICAPMessageRepo icapMessageRepo;
-
+    @Autowired
+    private ICAPSessionManager icapSessionManager;
     /**
      * @return
      */
@@ -49,11 +47,9 @@ public class InterfaceConfiguration {
      * @return
      */
     @Bean
-    public List<ICMsg> initMsgs() {
-        List<ICMsg> msgs = new ArrayList<>();
-        ICMsg msg = new ICMsgTradeRequest(
-                EICTradeRequest.eTradeRequestUnmatched, "");
-        msgs.add(msg);
+    public List<ICAPMessage> initMsgs() {
+        List<ICAPMessage> msgs = new ArrayList<>();
+        msgs.add(new ICAPMessage(new ICMsgTradeRequest(EICTradeRequest.eTradeRequestUnmatched, "")));
         return msgs;
     }
 
@@ -64,6 +60,7 @@ public class InterfaceConfiguration {
     public Connector[] connectors() {
         return new Connector[]{
                 new ICAPConnector(
+                        icapSessionManager,
                         ServerSignature.builder()
                                 .ssl(ssl)
                                 .host(host)

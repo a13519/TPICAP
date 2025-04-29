@@ -97,7 +97,7 @@ public class ICMessageRecorder extends Recorder {
                     }
                     default -> {
                         StringBuffer sBuff = new StringBuffer();
-                        sBuff.append("Msg received (MsgType: " + msg.getType() + ")\n");
+                        sBuff.append("\nMsg received (MsgType: " + msg.getType() + ")\n");
                         log.info(messageLogGenerator.generateLog(msg.icMsg, sBuff.toString()));
                         bSuccess = false;
                     }

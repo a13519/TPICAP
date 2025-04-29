@@ -14,9 +14,12 @@ import java.nio.file.Path;
  *
  */
 public class ICAPMessage extends RecordableMessage implements Message {
-
+    /**
+     *
+     * @param icMsg
+     */
     public ICAPMessage(ICMsg icMsg) {
-        super(icMsg);
+        super(icMsg, System.currentTimeMillis());
     }
 
     @Override
@@ -31,7 +34,7 @@ public class ICAPMessage extends RecordableMessage implements Message {
 
     @Override
     public String getId() {
-        return icMsg.getFirmId();
+        return icMsg.getFirmId()+"."+icMsg.getRequestId()+"."+icMsg.getSequenceNumber() ;
     }
 
     /**
