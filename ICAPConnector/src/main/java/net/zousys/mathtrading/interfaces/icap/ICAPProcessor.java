@@ -19,10 +19,6 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
     private String pendingPath;
     @Value("${app.tracing.path.failure}")
     private String failurePath;
-//
-//    private File success = new File(sucessPath);
-//    private File pending = new File(pendingPath);
-//    private File failure = new File(failurePath);
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {

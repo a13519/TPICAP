@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
@@ -22,6 +23,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ICAPMessageRepo {
     @Autowired
     private ICMessageRecorder icMessageRecorder;
+    @Autowired
+    private Set<String> bizTypes;
     private ConcurrentLinkedQueue<Message> queue = new ConcurrentLinkedQueue();
     private Lock lock = new ReentrantLock();
     private Condition write = lock.newCondition();
@@ -34,15 +37,17 @@ public class ICAPMessageRepo {
      * @param message
      */
     public void push(ICAPMessage message) {
-        collected.addAndGet(1);
-        queue.add(message);
-        icMessageRecorder.record(message);
-        lock.lock();
-        try {
-            write.signalAll();
-        } finally {
-            lock.unlock();
+        if (bizTypes.contains(message.getType())) {
+            collected.addAndGet(1);
+            queue.add(message);
+            lock.lock();
+            try {
+                write.signalAll();
+            } finally {
+                lock.unlock();
+            }
         }
+        icMessageRecorder.record(message);
     }
 
     /**
