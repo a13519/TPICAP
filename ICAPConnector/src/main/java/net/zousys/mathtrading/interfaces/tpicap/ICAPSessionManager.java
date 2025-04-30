@@ -6,37 +6,25 @@ import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcSession.ICCallback;
 import com.icap.iConnect.srcSession.ICSession;
 import com.icap.iConnect.srcSession.ICSessionMngr;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.SessionException;
-import net.zousys.mathtrading.interfaces.tpicap.config.Constants;
-import net.zousys.mathtrading.interfaces.tpicap.config.EssentialConfig;
-import net.zousys.mathtrading.interfaces.tpicap.tracing.Recorder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
+import net.zousys.mathtrading.interfaces.tpicap.tracing.ICMessageRecorder;
 
-import java.io.File;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Flow;
 
 @Slf4j
-@Component
-public class ICAPSessionManager {
-    @Value("${app.connection.proxyHost:null}")
-    private String proxyHost;
-    @Value("${app.connection.proxyPort:-1}")
-    private int proxyPort;
-    @Value("${app.tracing.path.raw}")
-    private String icmsgTraceRoot;
-    @Autowired
-    private EssentialConfig.EnumConfig enumConfig;
-    @Autowired
-    private ExecutorService recorderService;
+@Builder
+public class ICAPSessionManager implements Flow.Subscriber<ICAPMessage> {
     @Getter
     private ICSession icSession;
     private ServerSignature serverSignature;
     private ICCallback icCallback;
+    private ICMessageRecorder icMessageRecorder;
 
     /**
      * @throws SessionException
@@ -55,10 +43,13 @@ public class ICAPSessionManager {
         icSession.setCheckHeartbeatTimeout(130 * 1000);
         icSession.setCompression(EICCompressionType.eCompressedData);
 
-        if (proxyHost!=null&&proxyPort!=-1) {
-            icSession.setProxyHostPort(proxyHost, proxyPort);
+        if (serverSignature.getProxyHost() != null && serverSignature.getProxyPort() != -1) {
+            icSession.setProxyHostPort(
+                    serverSignature.getHost(),
+                    serverSignature.getPort());
         }
         EICErr err = icSession.connect();
+
         if (EICErr.eErrSuccess == err) {
             log.info("Successful login");
             return;
@@ -80,21 +71,25 @@ public class ICAPSessionManager {
     }
 
     /**
+     * @param icm
+     */
+    protected void dispath(ICAPMessage icm) {
+        if (icm != null) {
+            EICErr eicErr = icSession.send(icm.getIcMsg());
+            if (eicErr == EICErr.eErrSuccess) {
+                log.info("Request has been successfully dispatched: {}", icm.getType());
+            } else {
+                log.error("Request dipatched with negative ack: " + icm);
+            }
+        }
+    }
+
+    /**
      * @param vRequests
      */
     protected void dispath(List<ICAPMessage> vRequests) {
         if (vRequests != null) {
-            vRequests.forEach(icm -> {
-                EICErr eicErr = icSession.send(icm.getIcMsg());
-                if (enumConfig.getContentLevel()== Constants.ContentLevel.OUTBOUND) {
-                    Recorder.recordMessage(icm, new File(icmsgTraceRoot).toPath(), recorderService);
-                }
-                if (eicErr == EICErr.eErrSuccess) {
-                    log.info("Request has been successfully dispatched: " + icm);
-                } else {
-                    log.error("Request dipatched with negative ack: " + icm);
-                }
-            });
+            vRequests.forEach(icm -> dispath(icm));
         }
     }
 
@@ -113,5 +108,27 @@ public class ICAPSessionManager {
             log.warn("Closing session, sleep interruption. Program continue: " + e.getLocalizedMessage());
         }
         return true;
+    }
+
+    @Override
+    public void onSubscribe(Flow.Subscription subscription) {
+
+    }
+
+    @Override
+    public void onNext(ICAPMessage icapMessage) {
+        if (icapMessage != null && icSession.isConnected()) {
+            dispath(icapMessage);
+        }
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+
+    }
+
+    @Override
+    public void onComplete() {
+
     }
 }

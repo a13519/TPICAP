@@ -13,20 +13,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 @Slf4j
 public class Recorder {
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
     protected static final String dateTag() {
         return LocalDate.now().format(formatter);
     }
-
     protected static final String messageId(long time, String type) {
         return time + "_" + type;
     }
-
     /**
      *
      * @param message
@@ -34,8 +32,7 @@ public class Recorder {
      * @param executorService
      */
     public static final void recordMessage(ICAPMessage message, Path root, ExecutorService executorService) {
-        // TODO
-//        CompletableFuture.runAsync(() -> {
+        CompletableFuture.runAsync(() -> {
             try {
                 Path subroot = root.resolve(dateTag());
                 Files.createDirectories(subroot);
@@ -50,10 +47,6 @@ public class Recorder {
                 log.error(message.toString());
                 log.error("------------------");
             }
-//        }, executorService);
-
-
+        }, executorService);
     }
-
-
 }

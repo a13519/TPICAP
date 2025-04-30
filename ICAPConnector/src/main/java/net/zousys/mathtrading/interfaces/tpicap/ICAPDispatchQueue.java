@@ -1,5 +1,6 @@
 package net.zousys.mathtrading.interfaces.tpicap;
 
+import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Message;
@@ -8,8 +9,10 @@ import net.zousys.mathtrading.interfaces.tpicap.config.EssentialConfig;
 import net.zousys.mathtrading.interfaces.tpicap.model.MsgClassifier;
 import net.zousys.mathtrading.interfaces.tpicap.tracing.ICMessageRecorder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
@@ -18,35 +21,45 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 @Component
-public class ICAPMessageRepo {
+public class ICAPDispatchQueue {
     @Autowired
     private ICMessageRecorder icMessageRecorder;
     @Autowired
-    private MsgClassifier classifier;
-    @Autowired
     private EssentialConfig.EnumConfig enumConfig;
-    private ConcurrentLinkedQueue<Message> queue = new ConcurrentLinkedQueue();
+    @Autowired
+    private MsgClassifier classifier;
+    @Value("${app.tracing.message.detailed}")
+    private boolean detailed;
+
+    private ConcurrentLinkedQueue<ICAPMessage> queue = new ConcurrentLinkedQueue();
     private Lock lock = new ReentrantLock();
     private Condition write = lock.newCondition();
     @Getter
-    private AtomicLong collected = new AtomicLong(0l);
-    @Getter
-    private AtomicLong consumed = new AtomicLong(0l);
+    private AtomicLong total = new AtomicLong(0l);
+
+    /**
+     * @param messages
+     */
+    public void push(List<ICAPMessage> messages) {
+        messages.forEach(m -> push(m));
+    }
 
     /**
      * @param message
      */
     public void push(ICAPMessage message) {
-        if (isSerialiable(message)) {
-                collected.addAndGet(1);
-                queue.add(message);
-                lock.lock();
-                try {
-                    write.signalAll();
-                } finally {
-                    lock.unlock();
-                }
-            icMessageRecorder.record(message);
+        if (message != null) {
+            total.addAndGet(1);
+            queue.add(message);
+            lock.lock();
+            try {
+                write.signalAll();
+            } finally {
+                lock.unlock();
+            }
+            if (isSerialiable(message)) {
+                icMessageRecorder.record(message);
+            }
         }
     }
 
@@ -58,7 +71,7 @@ public class ICAPMessageRepo {
         try {
             write.await();
         } catch (Exception e) {
-            log.error("Exception from await queue: " + e.getLocalizedMessage());
+            log.error("Exception from await dispatch queue: " + e.getLocalizedMessage());
         } finally {
             lock.unlock();
         }
@@ -74,8 +87,8 @@ public class ICAPMessageRepo {
     /**
      * @return
      */
-    public Message poll() {
-        consumed.addAndGet(1);
+    public ICAPMessage poll() {
+        total.addAndGet(1);
         return queue.poll();
     }
 

@@ -1,11 +1,11 @@
 package net.zousys.mathtrading.interfaces.tpicap.config;
 
 import com.icap.iConnect.srcMsgs.enums.EICTradeRequest;
-import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeRequest;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.tpicap.*;
+import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +17,10 @@ import java.util.concurrent.Flow;
 
 @Configuration
 public class InterfaceConfiguration {
-
+    @Value("${app.connection.proxyHost:null}")
+    private String proxyHost;
+    @Value("${app.connection.proxyPort:-1}")
+    private int proxyPort;
     @Value("${app.connection.host}")
     private String host;
     @Value("${app.connection.port}")
@@ -31,7 +34,9 @@ public class InterfaceConfiguration {
     @Autowired
     private ICAPMessageRepo icapMessageRepo;
     @Autowired
-    private ICAPSessionManager icapSessionManager;
+    private ICAPDispatchQueue icapDispatchQueue;
+    @Autowired
+    private EssentialConfig.EnumConfig enumConfig;
     /**
      * @return
      */
@@ -57,13 +62,14 @@ public class InterfaceConfiguration {
     public Connector[] connectors() {
         return new Connector[]{
                 new ICAPConnector(
-                        icapSessionManager,
                         ServerSignature.builder()
                                 .ssl(ssl)
                                 .host(host)
                                 .port(port)
                                 .key(key)
-                                .value(value).build(), icapMessageRepo, initMsgs()
+                                .value(value)
+                                .proxyHost(proxyHost)
+                                .proxyPort(proxyPort).build(), icapMessageRepo, icapDispatchQueue, initMsgs()
                 )
         };
     }

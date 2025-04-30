@@ -106,19 +106,7 @@ public class RecordableMessage <T extends ICMsg> {
 
 
         public static void main(String[] args) throws IOException {
-            // Example ByteBuffer
-            ByteBuffer buffer = ByteBuffer.wrap(FileReader.readFileToBytes("/Users/songzou/Documents/IdeaProjects/TPICAP/ICAPConnector/src/test/resources/1745911349680_eMsgPositiveLogin.irm"));
 
-            // Skip the first byte (move position to index 1)
-            buffer.position(1);
-
-            // Create a new ByteBuffer from the current position to the end
-            ByteBuffer subBuffer = buffer.slice();
-            buffer.flip();
-            // Print the contents of the subBuffer
-            while (subBuffer.hasRemaining()) {
-                System.out.println(subBuffer.get());
-            }
         }
 
 

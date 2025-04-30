@@ -1,4 +1,4 @@
-package net.zousys.mathtrading.interfaces.tpicap.config;
+package net.zousys.mathtrading.interfaces.tpicap.model;
 
 import lombok.AllArgsConstructor;
 
@@ -34,6 +34,6 @@ public class MsgClassifier {
      * @return
      */
     public boolean isQualified(String type) {
-        return isBizType(type)||!isExcluded(type);
+        return isBizType(type)&&!isExcluded(type);
     }
 }

@@ -1,46 +1,60 @@
 package net.zousys.mathtrading.interfaces.tpicap;
 
 import com.icap.iConnect.srcMsgs.enums.EICErr;
-import com.icap.iConnect.srcMsgs.enums.EICMsgType;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgOrderBookRemove;
-import com.icap.iConnect.srcMsgs.iCMsg.ICMsgPositiveLogin;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeBookRemove;
-import com.icap.iConnect.srcMsgs.iCUtils.ICMessageBuffer;
 import com.icap.iConnect.srcSession.ICCallback;
 import com.icap.iConnect.srcSession.ICSession;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.SessionException;
+import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 
 @Slf4j
 public class ICAPConnector extends Connector implements ICCallback {
+
     private ServerSignature serverSignature;
     private ICAPSessionManager icapSessionManager;
     private ICAPMessageRepo icapMessageRepo;
+    private ICAPDispatchQueue icapDispatchQueue;
     private List<ICAPMessage> initMsgs;
     public Boolean started = false;
 
     /**
      *
-     * @param icapSessionManager
      * @param serverSignature
      * @param icapMessageRepo
      * @param msgs
      */
     public ICAPConnector(
-            ICAPSessionManager icapSessionManager,
             ServerSignature serverSignature,
             ICAPMessageRepo icapMessageRepo,
+            ICAPDispatchQueue icapDispatchQueue,
             List<ICAPMessage> msgs) {
         super();
-        this.icapSessionManager = icapSessionManager;
         this.serverSignature = serverSignature;
         this.icapMessageRepo = icapMessageRepo;
+        this.icapDispatchQueue = icapDispatchQueue;
         this.initMsgs = msgs;
+        this.icapSessionManager = ICAPSessionManager.builder()
+                .serverSignature(serverSignature)
+                .icCallback(this).build();
+
+        CompletableFuture.runAsync(() -> {
+            while (true) {
+                if (!icapDispatchQueue.isEmpty()) {
+                    icapSessionManager.onNext(icapDispatchQueue.poll());
+                } else {
+                    icapDispatchQueue.await();
+                }
+            }
+        }, Executors.newFixedThreadPool(1));
     }
 
     /**
@@ -50,7 +64,7 @@ public class ICAPConnector extends Connector implements ICCallback {
     public void connect() {
         try {
             icapSessionManager.openSession(serverSignature, this);
-            icapSessionManager.dispath(initMsgs);
+            icapDispatchQueue.push(initMsgs);
             started = true;
         } catch (SessionException e) {
             throw new RuntimeException(e);

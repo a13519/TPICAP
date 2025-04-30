@@ -32,8 +32,8 @@ app:
     ssl: false
     host: 204.179.96.165
     port: 6264
-#    proxyHost: x
-#    proxyPort: 1
+    proxyHost:
+    proxyPort: -1
     key: devscrpstpic
     value: test
     refresh: 240000
@@ -52,9 +52,9 @@ app:
       interval: 86400000
       path: archive
     message:
-      serialize-level: ALL            # ALL: business message and session message
+      serialize-level: BUSINESS       # ALL: business message and session message
                                       # BUSINESS: business message only
-      content-level:   OUTBOUND       # NONE: Nothing to trace (not recommended)
+      content-level:   INBOUND        # NONE: Nothing to trace (not recommended)
                                       # BUSINESS: businesss only
                                       # INBOUND: inbound message only
                                       # OUTBOUND: includes outbound
