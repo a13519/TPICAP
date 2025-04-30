@@ -49,20 +49,6 @@ public class ICAPMessageRepo {
      */
     public void push(ICAPMessage message) {
         if (isSerialiable(message)) {
-            if (message.getIcMsg().getMsgType()== EICMsgType.eMsgPositive) {
-                ICMsg icMsgr = message.getIcMsg();
-                ICMessageBuffer mb = new ICMessageBuffer();
-                icMsgr.pack(mb);
-                byte[] data = RecordableMessage.fromByteBuffer(mb.getBuffer(), -1, -1);
-
-                ICMsg icMsgr2 = new ICMsgPositive();
-                ICMessageBuffer mb2 = new ICMessageBuffer();
-                mb2.put(data);
-            mb2.rewind();
-                icMsgr2.unpack(mb2);
-int s =0;
-            }
-
                 collected.addAndGet(1);
                 queue.add(message);
                 lock.lock();
