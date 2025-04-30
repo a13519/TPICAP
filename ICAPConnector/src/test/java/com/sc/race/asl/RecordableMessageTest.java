@@ -15,35 +15,35 @@ public class RecordableMessageTest {
         byte[] bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
         assert(bytes.length==201);
         assert(bytes[0]==64);
-        ICMsgLogUpdate lu = (ICMsgLogUpdate)RecordableMessage.parse(bytes);
+        ICMsgLogUpdate lu = (ICMsgLogUpdate)RecordableMessage.parse(bytes).getIcMsg();
         assert(lu != null);
 
         msg = new ICMsgPositive();
         bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
         assert(bytes.length==201);
         assert(bytes[0]==102);
-        ICMsgPositive p = (ICMsgPositive)RecordableMessage.parse(bytes);
+        ICMsgPositive p = (ICMsgPositive)RecordableMessage.parse(bytes).getIcMsg();
         assert(p != null);
 
         msg = new ICMsgPositiveLogin();
         bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
         assert(bytes.length==201);
         assert(bytes[0]==105);
-        ICMsgPositiveLogin mpl = (ICMsgPositiveLogin)RecordableMessage.parse(bytes);
+        ICMsgPositiveLogin mpl = (ICMsgPositiveLogin)RecordableMessage.parse(bytes).getIcMsg();
         assert(mpl != null);
 
         msg = new ICMsgHeartbeat();
         bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
         assert(bytes.length==201);
         assert(bytes[0]==100);
-        ICMsgHeartbeat hb = (ICMsgHeartbeat)RecordableMessage.parse(bytes);
+        ICMsgHeartbeat hb = (ICMsgHeartbeat)RecordableMessage.parse(bytes).getIcMsg();
         assert(hb != null);
 
         msg = new ICMsgClearBookUpdate();
         bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
         assert(bytes.length==201);
         assert(bytes[0]==91);
-        ICMsgClearBookUpdate cbu = (ICMsgClearBookUpdate)RecordableMessage.parse(bytes);
+        ICMsgClearBookUpdate cbu = (ICMsgClearBookUpdate)RecordableMessage.parse(bytes).getIcMsg();
         assert(cbu != null);
     }
 

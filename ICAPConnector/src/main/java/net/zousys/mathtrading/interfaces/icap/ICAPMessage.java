@@ -13,7 +13,7 @@ import java.nio.file.Path;
 /**
  *
  */
-public class ICAPMessage extends RecordableMessage implements Message {
+public class ICAPMessage <T extends ICMsg> extends RecordableMessage implements Message {
     /**
      *
      * @param icMsg
@@ -22,9 +22,17 @@ public class ICAPMessage extends RecordableMessage implements Message {
         super(icMsg, System.currentTimeMillis());
     }
 
+    /**
+     *
+     * @param rMsg
+     */
+    public ICAPMessage(RecordableMessage rMsg) {
+        super(rMsg.getIcMsg(), System.currentTimeMillis());
+    }
+
     @Override
-    public <T extends ICMsg> ICMsg message() {
-        return null;
+    public <T extends ICMsg> T message() {
+        return (T) getIcMsg();
     }
 
     @Override
@@ -43,7 +51,7 @@ public class ICAPMessage extends RecordableMessage implements Message {
      */
     public static ICAPMessage form(byte[] payload) {
         if (payload != null) {
-            ICMsg msg = RecordableMessage.parse(payload);
+            RecordableMessage msg = RecordableMessage.parse(payload);
             return new ICAPMessage(msg);
         } else {
             return new ICAPMessage(new ICMsg());

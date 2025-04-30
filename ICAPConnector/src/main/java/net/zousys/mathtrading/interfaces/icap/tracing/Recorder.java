@@ -2,6 +2,7 @@ package net.zousys.mathtrading.interfaces.icap.tracing;
 
 import com.icap.iConnect.srcMsgs.enums.EICMsgType;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
+import com.icap.iConnect.srcMsgs.iCMsg.ICMsgPositive;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgPositiveLogin;
 import com.icap.iConnect.srcMsgs.iCUtils.ICMessageBuffer;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class Recorder {
      * @param executorService
      */
     public static final void recordMessage(ICAPMessage message, Path root, ExecutorService executorService) {
+        // TODO
 //        CompletableFuture.runAsync(() -> {
             try {
                 Path subroot = root.resolve(dateTag());
@@ -50,6 +52,8 @@ public class Recorder {
                 log.error("------------------");
             }
 //        }, executorService);
+
+
     }
 
 

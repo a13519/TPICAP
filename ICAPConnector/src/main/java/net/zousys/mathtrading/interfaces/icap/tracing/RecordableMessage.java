@@ -5,24 +5,25 @@ import com.icap.iConnect.srcMsgs.iCMsg.*;
 import com.icap.iConnect.srcMsgs.iCUtils.ICMessageBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.zousys.mathtrading.interfaces.icap.ICAPMessage;
 import net.zousys.mathtrading.interfaces.util.FileReader;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 @AllArgsConstructor
-public class  RecordableMessage {
+public class  RecordableMessage <T extends ICMsg> {
     @Getter
-    protected ICMsg icMsg;
+    protected T icMsg;
     @Getter
     protected long time;
+
     /**
      *
      * @param name
      * @return
-     * @param <T>
      * @throws IOException
      */
-    public static <T extends ICMsg> T parse(String name) throws IOException {
+    public static RecordableMessage parse(String name) throws IOException {
         return parse(FileReader.readFileToBytes(name));
     }
     /**
@@ -30,14 +31,19 @@ public class  RecordableMessage {
      * @param data
      * @return
      */
-    public static <T extends ICMsg> T parse(byte[] data) {
+    public static RecordableMessage parse(byte[] data) {
         ByteBuffer bb = ByteBuffer.wrap(data);
         byte type = bb.get();
         ICMsg icMsgr = new ICMsg();
         icMsgr.setMsgType(EICMsgType.getName((int)type));
         bb.position(1);
         ByteBuffer sub = bb.slice();
-        return (T) new RecordableMessage(icMsgr, System.currentTimeMillis()).getICMessage(true);
+        ICMessageBuffer mb = new ICMessageBuffer(sub);
+        mb.flip();
+        mb.limit(mb.capacity());
+        RecordableMessage rmessage = new RecordableMessage(icMsgr, System.currentTimeMillis());
+        rmessage.unmashall(mb, true);
+        return rmessage;
     }
 
     /**
@@ -62,6 +68,15 @@ public class  RecordableMessage {
         return mb.getBuffer();
     }
 
+    /**
+     *
+     * @param buffer
+     * @param init
+     */
+    protected void unmashall(ICMessageBuffer buffer, boolean init) {
+        icMsg = getICMessage(init);
+        icMsg.unpack(buffer);
+    }
     /**
      *
      * @return
@@ -92,21 +107,35 @@ public class  RecordableMessage {
         }
     }
 
-
-        public static void main(String[] args) throws IOException {
-            // Example ByteBuffer
-            ByteBuffer buffer = ByteBuffer.wrap(FileReader.readFileToBytes("/Users/songzou/Documents/IdeaProjects/TPICAP/ICAPConnector/src/test/resources/1745911349680_eMsgPositiveLogin.irm"));
-
-            // Skip the first byte (move position to index 1)
-            buffer.position(1);
-
-            // Create a new ByteBuffer from the current position to the end
-            ByteBuffer subBuffer = buffer.slice();
-            buffer.flip();
-            // Print the contents of the subBuffer
-            while (subBuffer.hasRemaining()) {
-                System.out.println(subBuffer.get());
+        public static final byte[] fromByteBuffer(ByteBuffer bb, int start, int end) {
+            bb.rewind();
+            bb.limit(bb.capacity());
+            if (start < 0) {
+                start = 0;
             }
+            if (end > bb.capacity()|| end < 0) {
+                end = bb.capacity();
+            }
+            byte[] extracted = new byte[end - start];
+            bb.position(start); // Set position to startIndex
+            bb.get(extracted, start, end - start); // Extract bytes
+            return extracted;
+        }
+        public static void main(String[] args) throws IOException {
+            ICMsg icMsgr = new ICMsg();
+            ICMessageBuffer mb = new ICMessageBuffer();
+            icMsgr.pack(mb);
+            byte[] data = fromByteBuffer(mb.getBuffer(), -1, -1);
+
+            ICMsg icMsgr2 = new ICMsg();
+            ICMessageBuffer mb2 = new ICMessageBuffer();
+            mb2.put(data);
+//            mb2.rewind();
+            icMsgr2.unpack(mb2);
+
+            ICAPMessage irm = new ICAPMessage(icMsgr2);
+            byte[] xx = irm.serialize();
+            int a =1;
         }
 
 

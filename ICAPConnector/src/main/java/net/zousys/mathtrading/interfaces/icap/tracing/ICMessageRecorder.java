@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.icap.ICAPMessage;
 import net.zousys.mathtrading.interfaces.icap.config.Constants;
 import net.zousys.mathtrading.interfaces.icap.config.EssentialConfig;
+import net.zousys.mathtrading.interfaces.icap.config.MsgClassifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -41,7 +42,7 @@ public class ICMessageRecorder extends Recorder {
     @Autowired
     private MessageLogGenerator messageLogGenerator;
     @Autowired
-    private Set<String> bizTypes;
+    private MsgClassifier classifier;
 
     /**
      * Process messages from server.
@@ -50,13 +51,12 @@ public class ICMessageRecorder extends Recorder {
      * @return <tt>true</tt> if success
      */
     public boolean record(ICAPMessage msg) {
-        if (isSerialiable(msg)) {
-            recordMessage(msg, new File(icmsgTraceRoot).toPath(), recorderService);
-        }
+        recordMessage(msg, new File(icmsgTraceRoot).toPath(), recorderService);
         boolean bSuccess = true;
         if (enumConfig.getContentLevel() != Constants.ContentLevel.NONE) {
             EICMsgType msgType = msg.icMsg.getMsgType();
-            if (bizTypes.contains(msgType.name())
+
+            if (classifier.isQualified(msgType.name())
                     ||enumConfig.getContentLevel()== Constants.ContentLevel.INBOUND
                     ||enumConfig.getContentLevel()== Constants.ContentLevel.OUTBOUND) {
                 switch (msgType) {
@@ -107,17 +107,6 @@ public class ICMessageRecorder extends Recorder {
         return bSuccess;
     }
 
-    /**
-     * @param icapMessage
-     * @return
-     */
-    private boolean isSerialiable(ICAPMessage icapMessage) {
-        if (enumConfig.getSerializeLevel() == Constants.SerializeLevel.ALL) {
-            return true;
-        } else {
-            return bizTypes.contains(icapMessage.getType());
-        }
-    }
 
     /**
      * @param msgRef

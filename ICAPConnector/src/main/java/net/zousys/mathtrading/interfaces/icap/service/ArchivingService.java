@@ -26,6 +26,8 @@ public class ArchivingService {
     private String pendingPath;
     @Value("${app.tracing.path.failure}")
     private String failurePath;
+    @Value("${app.tracing.path.raw}")
+    private String rawPath;
     @Value("${app.tracing.archiving.path}")
     private String archiverPath;
     private int threshold = 0;
@@ -39,10 +41,12 @@ public class ArchivingService {
         File success = new File(sucessPath);
         File pending = new File(pendingPath);
         File failure = new File(failurePath);
+        File raw = new File(rawPath);
         try {
             archiveMessageFiles(success);
             archiveMessageFiles(pending);
             archiveMessageFiles(failure);
+            archiveMessageFiles(raw);
         } catch (IOException e) {
             log.error("Archive caught exception: {}", e.getLocalizedMessage());
         }

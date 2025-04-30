@@ -57,7 +57,7 @@ public class EssentialConfig {
     }
 
     @Bean
-    public Set<String> bizTypes() {
+    public MsgClassifier classifier() {
         Properties properties = new Properties();
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("business-types.properties")) {
             if (inputStream == null) {
@@ -65,15 +65,17 @@ public class EssentialConfig {
             }
             properties.load(inputStream);
             String types = properties.getProperty("types");
-            return new HashSet<>(
-                    Arrays.stream(types.split(","))
-                            .map(String::trim).toList()
+            String exclusion = properties.getProperty("exclusion");
+            return new MsgClassifier(
+                    new HashSet<>(Arrays.stream(types.split(",")).map(String::trim).toList()),
+                    new HashSet<>(Arrays.stream(exclusion.split(",")).map(String::trim).toList())
             );
         } catch (Exception e) {
             log.error("Error thrown when loading business message types: " + e.getLocalizedMessage());
         }
-        return new HashSet<>();
+        return new MsgClassifier(new HashSet<>(), new HashSet<>());
     }
+
     @Data
     @Component
     @ConfigurationProperties(prefix = "app.tracing.message")
