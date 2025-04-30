@@ -1,4 +1,4 @@
-package net.zousys.mathtrading.interfaces.icap;
+package net.zousys.mathtrading.interfaces.tpicap;
 
 import com.icap.iConnect.srcMsgs.enums.EICCompressionType;
 import com.icap.iConnect.srcMsgs.enums.EICErr;
@@ -9,16 +9,15 @@ import com.icap.iConnect.srcSession.ICSessionMngr;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.SessionException;
-import net.zousys.mathtrading.interfaces.icap.config.Constants;
-import net.zousys.mathtrading.interfaces.icap.config.EssentialConfig;
-import net.zousys.mathtrading.interfaces.icap.tracing.Recorder;
+import net.zousys.mathtrading.interfaces.tpicap.config.Constants;
+import net.zousys.mathtrading.interfaces.tpicap.config.EssentialConfig;
+import net.zousys.mathtrading.interfaces.tpicap.tracing.Recorder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 @Slf4j

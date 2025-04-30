@@ -1,4 +1,4 @@
-package net.zousys.mathtrading.interfaces.icap.config;
+package net.zousys.mathtrading.interfaces.tpicap.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;

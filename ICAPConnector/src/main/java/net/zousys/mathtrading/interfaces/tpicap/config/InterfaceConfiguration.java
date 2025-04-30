@@ -1,12 +1,11 @@
-package net.zousys.mathtrading.interfaces.icap.config;
+package net.zousys.mathtrading.interfaces.tpicap.config;
 
 import com.icap.iConnect.srcMsgs.enums.EICTradeRequest;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeRequest;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.Message;
-import net.zousys.mathtrading.interfaces.icap.*;
-import net.zousys.mathtrading.interfaces.icap.tracing.ICMessageRecorder;
+import net.zousys.mathtrading.interfaces.tpicap.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,8 +13,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Flow;
 
 @Configuration

@@ -1,14 +1,9 @@
-package net.zousys.mathtrading.interfaces.icap;
+package net.zousys.mathtrading.interfaces.tpicap;
 
 import com.icap.iConnect.srcMsgs.iCMsg.*;
 import com.icap.iConnect.srcMsgs.iCUtils.ICMessageBuffer;
-import lombok.Getter;
 import net.zousys.mathtrading.interfaces.Message;
-import net.zousys.mathtrading.interfaces.icap.tracing.RecordableMessage;
-import net.zousys.mathtrading.interfaces.util.FileReader;
-
-import java.io.IOException;
-import java.nio.file.Path;
+import net.zousys.mathtrading.interfaces.tpicap.tracing.RecordableMessage;
 
 /**
  *

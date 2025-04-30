@@ -1,4 +1,4 @@
-package net.zousys.mathtrading.interfaces.icap.service;
+package net.zousys.mathtrading.interfaces.tpicap.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

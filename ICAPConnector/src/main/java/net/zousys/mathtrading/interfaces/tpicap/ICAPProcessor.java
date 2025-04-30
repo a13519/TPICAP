@@ -1,7 +1,5 @@
-package net.zousys.mathtrading.interfaces.icap;
+package net.zousys.mathtrading.interfaces.tpicap;
 
-import com.icap.iConnect.srcMsgs.enums.EICMsgType;
-import com.icap.iConnect.srcMsgs.iCMsg.ICMsgElectronicTransaction;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +34,7 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
                 case EICMsgType.eMsgElectronicTransaction: {
                     ICMsgElectronicTransaction met = message.message();
                     System.out.println("==="+met.getTradeData().getQuantity());
+
                     // TODO
                     break;
                 }

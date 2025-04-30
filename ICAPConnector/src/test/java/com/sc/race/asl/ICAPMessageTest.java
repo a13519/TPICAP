@@ -2,14 +2,11 @@ package com.sc.race.asl;
 
 import com.icap.iConnect.srcMsgs.enums.EICMsgType;
 import com.icap.iConnect.srcMsgs.iCMsg.*;
-import net.zousys.mathtrading.interfaces.icap.ICAPMessage;
-import net.zousys.mathtrading.interfaces.icap.tracing.RecordableMessage;
+import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
 import net.zousys.mathtrading.interfaces.util.FileReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class ICAPMessageTest {
 

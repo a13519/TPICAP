@@ -1,4 +1,4 @@
-package net.zousys.mathtrading.interfaces.icap.tracing;
+package net.zousys.mathtrading.interfaces.tpicap.tracing;
 
 import com.icap.iConnect.srcMsgs.enums.EICErr;
 import com.icap.iConnect.srcMsgs.enums.EICMsgType;
@@ -8,19 +8,15 @@ import com.icap.iConnect.srcMsgs.vectors.MarketSubmarketPermsVector;
 import com.icap.iConnect.srcMsgs.vectors.SubmarketPermsVector;
 import com.icap.iConnect.srcSession.ICSession;
 import lombok.extern.slf4j.Slf4j;
-import net.zousys.mathtrading.interfaces.icap.ICAPMessage;
-import net.zousys.mathtrading.interfaces.icap.config.Constants;
-import net.zousys.mathtrading.interfaces.icap.config.EssentialConfig;
-import net.zousys.mathtrading.interfaces.icap.config.MsgClassifier;
+import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
+import net.zousys.mathtrading.interfaces.tpicap.config.Constants;
+import net.zousys.mathtrading.interfaces.tpicap.config.EssentialConfig;
+import net.zousys.mathtrading.interfaces.tpicap.config.MsgClassifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 /**

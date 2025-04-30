@@ -1,8 +1,7 @@
-package net.zousys.mathtrading.interfaces.icap.config;
+package net.zousys.mathtrading.interfaces.tpicap.config;
 
 import com.icap.iConnect.srcMsgs.enums.EICMsgType;
 import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,7 +13,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

@@ -1,4 +1,4 @@
-package net.zousys.mathtrading.interfaces.icap;
+package net.zousys.mathtrading.interfaces.tpicap;
 
 import lombok.Builder;
 import lombok.Data;

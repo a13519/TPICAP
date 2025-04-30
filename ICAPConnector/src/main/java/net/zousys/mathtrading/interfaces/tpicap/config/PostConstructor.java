@@ -1,4 +1,4 @@
-package net.zousys.mathtrading.interfaces.icap.config;
+package net.zousys.mathtrading.interfaces.tpicap.config;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;

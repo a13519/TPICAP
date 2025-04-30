@@ -1,8 +1,7 @@
-package net.zousys.mathtrading.interfaces.icap.config;
+package net.zousys.mathtrading.interfaces.tpicap.config;
 
 import lombok.AllArgsConstructor;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**

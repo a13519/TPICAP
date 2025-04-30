@@ -1,7 +1,7 @@
 package net.zousys.mathtrading;
 
 import lombok.extern.slf4j.Slf4j;
-import net.zousys.mathtrading.interfaces.icap.service.PTFService;
+import net.zousys.mathtrading.interfaces.tpicap.service.PTFService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

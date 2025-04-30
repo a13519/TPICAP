@@ -1,4 +1,4 @@
-package net.zousys.mathtrading.interfaces.icap;
+package net.zousys.mathtrading.interfaces.tpicap;
 
 import com.icap.iConnect.srcMsgs.enums.EICErr;
 import com.icap.iConnect.srcMsgs.enums.EICMsgType;
@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.SessionException;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 

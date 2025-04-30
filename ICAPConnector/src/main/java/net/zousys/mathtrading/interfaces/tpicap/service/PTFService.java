@@ -1,7 +1,7 @@
-package net.zousys.mathtrading.interfaces.icap.service;
+package net.zousys.mathtrading.interfaces.tpicap.service;
 
 import lombok.extern.slf4j.Slf4j;
-import net.zousys.mathtrading.interfaces.icap.ICAPSource;
+import net.zousys.mathtrading.interfaces.tpicap.ICAPSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;

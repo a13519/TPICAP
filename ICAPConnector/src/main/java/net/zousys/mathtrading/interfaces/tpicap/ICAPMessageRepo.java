@@ -1,4 +1,4 @@
-package net.zousys.mathtrading.interfaces.icap;
+package net.zousys.mathtrading.interfaces.tpicap;
 
 import com.icap.iConnect.srcMsgs.enums.EICMsgType;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
@@ -7,21 +7,14 @@ import com.icap.iConnect.srcMsgs.iCUtils.ICMessageBuffer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Message;
-import net.zousys.mathtrading.interfaces.icap.config.Constants;
-import net.zousys.mathtrading.interfaces.icap.config.EssentialConfig;
-import net.zousys.mathtrading.interfaces.icap.config.MsgClassifier;
-import net.zousys.mathtrading.interfaces.icap.tracing.ICMessageRecorder;
-import net.zousys.mathtrading.interfaces.icap.tracing.RecordableMessage;
-import net.zousys.mathtrading.interfaces.icap.tracing.Recorder;
+import net.zousys.mathtrading.interfaces.tpicap.config.Constants;
+import net.zousys.mathtrading.interfaces.tpicap.config.EssentialConfig;
+import net.zousys.mathtrading.interfaces.tpicap.config.MsgClassifier;
+import net.zousys.mathtrading.interfaces.tpicap.tracing.ICMessageRecorder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.nio.ByteBuffer;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
