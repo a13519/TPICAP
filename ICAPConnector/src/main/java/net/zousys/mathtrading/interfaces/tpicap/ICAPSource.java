@@ -7,6 +7,7 @@ import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.Source;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -32,7 +33,7 @@ public class ICAPSource implements Source {
     private ExecutorService collectorService;
     private ExecutorService processorService;
     private Flow.Subscriber<Message> subscriber;
-    private Connector[] connectors;
+    private ICAPConnector[] connectors;
 
     /**
      * @param connectors
@@ -42,7 +43,7 @@ public class ICAPSource implements Source {
      */
     @Autowired
     public ICAPSource(
-            Connector[] connectors,
+            ICAPConnector[] connectors,
             ExecutorService collectorService,
             ExecutorService processorService,
             Flow.Subscriber<Message> subscriber) {
@@ -80,6 +81,19 @@ public class ICAPSource implements Source {
     @Override
     public void checkSession() {
         Arrays.stream(connectors).forEach(connector -> connector.maintainSession());
+    }
+
+    /**
+     *
+     */
+    @Scheduled(cron = "${app.session.begin}", zone = "America/New_York")
+    public void restartTheSessionTask() {
+        Arrays.stream(connectors).forEach(con -> {
+            if (con.getIcapSessionManager().getIcSession().isConnected()) {
+                con.disconnect();
+            }
+            con.connect();
+        });
     }
 
 }

@@ -8,15 +8,17 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Slf4j
+@EnableScheduling
 @SpringBootApplication
-public class InterfaceApplication implements CommandLineRunner {
+public class TPICAPInterfaceApplication implements CommandLineRunner {
     @Autowired
     private PTFService ptfService;
 
     public static void main(String[] args) {
-        SpringApplication.run(InterfaceApplication.class, args);
+        SpringApplication.run(TPICAPInterfaceApplication.class, args);
     }
 
     @Override

@@ -18,7 +18,6 @@ import java.util.zip.ZipOutputStream;
 
 @Slf4j
 @Service
-@EnableScheduling
 public class ArchivingService {
     @Value("${app.tracing.path.success}")
     private String sucessPath;

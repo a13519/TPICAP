@@ -14,10 +14,10 @@
 /ICAPConnector/build/
 /data/
 /loan-processor/build/
-/loan-source/.gradle/
-/loan-source/build/
 /Skipper/.gradle/
 /ICAPConnector/logs/
 /data/
 /logs/
 /tracing/
+/loan-source/.gradle/
+/loan-source/build/

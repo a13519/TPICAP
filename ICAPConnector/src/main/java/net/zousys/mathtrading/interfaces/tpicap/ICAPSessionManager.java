@@ -97,9 +97,9 @@ public class ICAPSessionManager implements Flow.Subscriber<ICAPMessage> {
      * @param msgList
      * @return
      */
-    protected boolean closeSession(List<ICMsg> msgList) {
+    protected boolean closeSession(List<ICAPMessage> msgList) {
         if (msgList != null && msgList.size() > 0) {
-            msgList.forEach(msg -> icSession.send(msg));
+            msgList.forEach(msg -> icSession.send(msg.getIcMsg()));
         }
         icSession.disconnect();
         try {

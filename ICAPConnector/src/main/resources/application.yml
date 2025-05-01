@@ -37,33 +37,36 @@ app:
     key: devscrpstpic
     value: test
     refresh: 240000
+  session:
+    begin: "0 0 6 * * *"  # 6:00 AM daily in prod EDT time
   pool:
-    connector: 1
-    processor: 4
-    recorder: 5
+    connector: 1           # Connector pool size
+    processor: 4           # processor pool size
+    recorder: 5            # recorder pool size
   tracing:
     path:
-      success: tracing/messages/success
-      failure: tracing/messages/failure
-      pending: tracing/messages/pending
-      raw: tracing/raw
+      success: tracing/messages/success       # success message folder
+      failure: tracing/messages/failure       # failure message folder
+      pending: tracing/messages/pending       # pending message folder
+      raw: tracing/raw                        # Raw message folder
     archiving:
       age: 30
       interval: 86400000
       path: archive
     message:
       serialize-level: BUSINESS       # ALL: business message and session message
-                                      # BUSINESS: business message only
-      content-level:   INBOUND        # NONE: Nothing to trace (not recommended)
-                                      # BUSINESS: businesss only
-                                      # INBOUND: inbound message only
-                                      # OUTBOUND: includes outbound
+      # BUSINESS: business message only
+      content-level: INBOUND        # NONE: Nothing to trace (not recommended)
+        # BUSINESS: businesss only
+        # INBOUND: inbound message only
+      # OUTBOUND: includes outbound
       detailed: true        # to log message content
       housekeeping: 0       # 0: no housekeeping
-                            # n: days to clean
+      # n: days to clean
   pooling:
     active: true
     path: tracing/pooling              # pooling forlder for testing
+
 
 management:
   endpoints:

@@ -1,11 +1,14 @@
 package net.zousys.mathtrading.interfaces.tpicap.config;
 
 import com.icap.iConnect.srcMsgs.enums.EICTradeRequest;
+import com.icap.iConnect.srcMsgs.iCMsg.ICMsgOrderBookRemove;
+import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeBookRemove;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeRequest;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.tpicap.*;
 import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
+import net.zousys.mathtrading.interfaces.tpicap.model.TradeVault;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -49,9 +52,17 @@ public class InterfaceConfiguration {
      * @return
      */
     @Bean
-    public List<ICAPMessage> initMsgs() {
+    public List<ICAPMessage> initCommands() {
         List<ICAPMessage> msgs = new ArrayList<>();
         msgs.add(new ICAPMessage(new ICMsgTradeRequest(EICTradeRequest.eTradeRequestUnmatched, "")));
+        return msgs;
+    }
+
+    @Bean
+    public List<ICAPMessage> closeCommands() {
+        List<ICAPMessage> msgs = new ArrayList<>();
+        msgs.add(new ICAPMessage(new ICMsgOrderBookRemove()));
+        msgs.add(new ICAPMessage(new ICMsgTradeBookRemove()));
         return msgs;
     }
 
@@ -59,8 +70,8 @@ public class InterfaceConfiguration {
      * @return
      */
     @Bean
-    public Connector[] connectors() {
-        return new Connector[]{
+    public ICAPConnector[] connectors() {
+        return new ICAPConnector[]{
                 new ICAPConnector(
                         ServerSignature.builder()
                                 .ssl(ssl)
@@ -69,9 +80,13 @@ public class InterfaceConfiguration {
                                 .key(key)
                                 .value(value)
                                 .proxyHost(proxyHost)
-                                .proxyPort(proxyPort).build(), icapMessageRepo, icapDispatchQueue, initMsgs()
+                                .proxyPort(proxyPort).build(),
+                        icapMessageRepo, icapDispatchQueue, initCommands(), closeCommands()
                 )
         };
     }
-
+    @Bean
+    public TradeVault tradeVault() {
+        return new TradeVault();
+    }
 }

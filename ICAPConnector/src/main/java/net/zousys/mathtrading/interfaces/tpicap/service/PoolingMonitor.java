@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -40,13 +41,13 @@ public class PoolingMonitor {
     @EventListener(ApplicationReadyEvent.class)
     public void startMonitoring() {
         if (poolingActive) {
-//            CompletableFuture.runAsync(() -> {
+            CompletableFuture.runAsync(() -> {
                 try {
                     monitorFolder();
                 } catch (IOException | InterruptedException e) {
                     System.err.println("Error monitoring folder: " + e.getMessage());
                 }
-//            }, monitorService);
+            }, monitorService);
         }
     }
 
