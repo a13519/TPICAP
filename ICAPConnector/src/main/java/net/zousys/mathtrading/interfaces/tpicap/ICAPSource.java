@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Flow;
 import java.util.stream.IntStream;
 
@@ -25,11 +26,8 @@ public class ICAPSource implements Source {
 
     @Value("${app.pool.connector}")
     private int poolConnector;
-    @Value("${app.pool.processor}")
-    private int poolProcessor;
     @Autowired
     private ICAPMessageRepo icapMessageRepo;
-
     private ExecutorService collectorService;
     private ExecutorService processorService;
     private Flow.Subscriber<Message> subscriber;
@@ -63,7 +61,7 @@ public class ICAPSource implements Source {
         } catch (RuntimeException re) {
             log.error("Exception from connector connect: " + re.getLocalizedMessage());
         }
-        IntStream.range(0, poolProcessor).forEach(i -> CompletableFuture.runAsync(() -> {
+        CompletableFuture.runAsync(() -> {
             while (true) {
                 if (!icapMessageRepo.isEmpty()) {
                     subscriber.onNext(icapMessageRepo.poll());
@@ -71,8 +69,7 @@ public class ICAPSource implements Source {
                     icapMessageRepo.await();
                 }
             }
-        }, processorService));
-
+        }, Executors.newSingleThreadExecutor());
     }
 
     /**

@@ -38,15 +38,6 @@ public class InterfaceConfiguration {
     private ICAPMessageRepo icapMessageRepo;
     @Autowired
     private ICAPDispatchQueue icapDispatchQueue;
-    @Autowired
-    private EssentialConfig.EnumConfig enumConfig;
-    /**
-     * @return
-     */
-    @Bean
-    public Flow.Subscriber<Message> subscriber() {
-        return new ICAPProcessor();
-    }
 
     /**
      * @return
@@ -58,6 +49,10 @@ public class InterfaceConfiguration {
         return msgs;
     }
 
+    /**
+     *
+     * @return
+     */
     @Bean
     public List<ICAPMessage> closeCommands() {
         List<ICAPMessage> msgs = new ArrayList<>();
@@ -85,6 +80,11 @@ public class InterfaceConfiguration {
                 )
         };
     }
+
+    /**
+     *
+     * @return
+     */
     @Bean
     public TradeVault tradeVault() {
         return new TradeVault();

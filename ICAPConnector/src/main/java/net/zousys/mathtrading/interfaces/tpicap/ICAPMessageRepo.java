@@ -25,7 +25,7 @@ public class ICAPMessageRepo {
     private MsgClassifier classifier;
     @Autowired
     private EssentialConfig.EnumConfig enumConfig;
-    private ConcurrentLinkedQueue<Message> queue = new ConcurrentLinkedQueue();
+    private ConcurrentLinkedQueue<ICAPMessage> queue = new ConcurrentLinkedQueue();
     private Lock lock = new ReentrantLock();
     private Condition write = lock.newCondition();
     @Getter
@@ -74,7 +74,7 @@ public class ICAPMessageRepo {
     /**
      * @return
      */
-    public Message poll() {
+    public ICAPMessage poll() {
         consumed.addAndGet(1);
         return queue.poll();
     }

@@ -32,20 +32,21 @@ public class EssentialConfig {
     public ExecutorService collectorService() {
         return Executors.newFixedThreadPool(poolConnector);
     }
-
     /**
      * @return
      */
     @Bean
     public ExecutorService monitorService() {
-        return Executors.newFixedThreadPool(1);
+        return Executors.newSingleThreadExecutor();
     }
-
+    /**
+     *
+     * @return
+     */
     @Bean
     public ExecutorService recorderService() {
         return Executors.newFixedThreadPool(poolRecorder);
     }
-
     /**
      * @return
      */
