@@ -5,6 +5,7 @@ import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
 import net.zousys.mathtrading.interfaces.tpicap.ParsingException;
 import net.zousys.mathtrading.interfaces.tpicap.model.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.tpicap.ICAPSource;
+import net.zousys.mathtrading.interfaces.tpicap.model.ServerStatus;
 import net.zousys.mathtrading.interfaces.util.FileReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +36,8 @@ public class PoolingMonitor {
     private ICAPSource icapSource;
     @Autowired
     private ICAPMessageRepo icapMessageRepo;
-
+    @Autowired
+    private ServerStatus serverStatus;
     /**
      *
      */
@@ -80,6 +82,7 @@ public class PoolingMonitor {
                         || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                     if (Files.isRegularFile(fullPath)) {
                         log.info("New file detected: " + fullPath);
+                        serverStatus.getPoolingFiles().incrementAndGet();
                         try {
                             icapMessageRepo.push(ICAPMessage.form(FileReader.readFileToBytes(fullPath)));
                         } catch (ParsingException e) {

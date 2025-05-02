@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.Source;
 import net.zousys.mathtrading.interfaces.tpicap.model.ICAPMessageRepo;
+import net.zousys.mathtrading.interfaces.tpicap.model.ServerStatus;
 import net.zousys.mathtrading.interfaces.tpicap.service.TradeVaultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,8 @@ import java.util.concurrent.Flow;
 public class ICAPSource implements Source {
     @Value("${app.pool.connector}")
     private int poolConnector;
+    @Autowired
+    private ServerStatus serverStatus;
     @Autowired
     private ICAPMessageRepo icapMessageRepo;
     @Autowired
@@ -87,6 +90,7 @@ public class ICAPSource implements Source {
     @Scheduled(cron = "${app.session.begin}", zone = "America/New_York")
     public void restartTheSessionTask() {
         tradeVaultService.reloadTradeVault();
+        serverStatus.reset();
         Arrays.stream(connectors).forEach(con -> {
             if (con.getIcapSessionManager().getIcSession().isConnected()) {
                 con.disconnect();

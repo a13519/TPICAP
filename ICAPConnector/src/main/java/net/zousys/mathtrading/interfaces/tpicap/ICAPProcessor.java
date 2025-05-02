@@ -3,7 +3,6 @@ package net.zousys.mathtrading.interfaces.tpicap;
 import com.icap.iConnect.srcMsgs.enums.EICIssueType;
 import com.icap.iConnect.srcMsgs.enums.EICMsgType;
 import com.icap.iConnect.srcMsgs.iCMsg.ICExtension;
-import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgElectronicTransaction;
 import com.icap.iConnect.srcMsgs.iCMsg.ICTradeData;
 import lombok.Getter;
@@ -11,6 +10,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.tpicap.entity.TradeVaultEntity;
+import net.zousys.mathtrading.interfaces.tpicap.model.ServerStatus;
 import net.zousys.mathtrading.interfaces.tpicap.model.TradeVault;
 import net.zousys.mathtrading.interfaces.tpicap.repository.TradeVaultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Flow;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Component("subscriber")
@@ -49,7 +46,8 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
     private TradeVault tradeVault;
     @Autowired
     private ZoneId zoneId;
-
+    @Autowired
+    private ServerStatus serverStatus;
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
 
@@ -65,12 +63,14 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
             log.info("\n" + message.toString());
             switch (((ICAPMessage) message).getICType()) {
                 case EICMsgType.eMsgElectronicTransaction: {
+                    serverStatus.getBizMessages().incrementAndGet();
                     CompletableFuture.runAsync(() -> {
                         bookTrade((ICMsgElectronicTransaction) message.message());
                     }, processorService);
                     break;
                 }
                 case EICMsgType.eMsgVoiceTransaction: {
+                    serverStatus.getBizMessages().incrementAndGet();
                     break;
                 }
             }
@@ -129,6 +129,7 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
                         .build()
         );
         tradeVault.add(tradeId);
+        serverStatus.getTradesBooked().incrementAndGet();
     }
 
     /**

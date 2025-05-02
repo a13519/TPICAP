@@ -5,10 +5,7 @@ import com.icap.iConnect.srcMsgs.iCMsg.ICMsgOrderBookRemove;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeBookRemove;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeRequest;
 import net.zousys.mathtrading.interfaces.tpicap.*;
-import net.zousys.mathtrading.interfaces.tpicap.model.ICAPDispatchQueue;
-import net.zousys.mathtrading.interfaces.tpicap.model.ICAPMessageRepo;
-import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
-import net.zousys.mathtrading.interfaces.tpicap.model.TradeVault;
+import net.zousys.mathtrading.interfaces.tpicap.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +34,8 @@ public class InterfaceConfiguration {
     private ICAPMessageRepo icapMessageRepo;
     @Autowired
     private ICAPDispatchQueue icapDispatchQueue;
-
+    @Autowired
+    private ServerStatus serverStatus;
     /**
      * @return
      */
@@ -74,7 +72,7 @@ public class InterfaceConfiguration {
                                 .value(value)
                                 .proxyHost(proxyHost)
                                 .proxyPort(proxyPort).build(),
-                        icapMessageRepo, icapDispatchQueue, initCommands(), closeCommands()
+                        icapMessageRepo, icapDispatchQueue, initCommands(), closeCommands(), serverStatus
                 )
         };
     }

@@ -11,6 +11,7 @@ import net.zousys.mathtrading.interfaces.SessionException;
 import net.zousys.mathtrading.interfaces.tpicap.model.ICAPDispatchQueue;
 import net.zousys.mathtrading.interfaces.tpicap.model.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
+import net.zousys.mathtrading.interfaces.tpicap.model.ServerStatus;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -25,6 +26,7 @@ public class ICAPConnector extends Connector implements ICCallback {
     private ICAPDispatchQueue icapDispatchQueue;
     private List<ICAPMessage> initCommands;
     private List<ICAPMessage> closeCommands;
+    private ServerStatus serverStatus;
     public Boolean started = false;
 
     /**
@@ -37,13 +39,15 @@ public class ICAPConnector extends Connector implements ICCallback {
             ICAPMessageRepo icapMessageRepo,
             ICAPDispatchQueue icapDispatchQueue,
             List<ICAPMessage> initCommands,
-            List<ICAPMessage> closeCommands) {
+            List<ICAPMessage> closeCommands,
+            ServerStatus serverStatus) {
         super();
         this.serverSignature = serverSignature;
         this.icapMessageRepo = icapMessageRepo;
         this.icapDispatchQueue = icapDispatchQueue;
         this.initCommands = initCommands;
         this.closeCommands = closeCommands;
+        this.serverStatus = serverStatus;
         this.icapSessionManager = ICAPSessionManager.builder()
                 .serverSignature(serverSignature)
                 .icCallback(this).build();
@@ -90,6 +94,7 @@ public class ICAPConnector extends Connector implements ICCallback {
         if (started) {
             log.debug("Checking session...");
             if (!icapSessionManager.getIcSession().isConnected()) {
+                serverStatus.getSessionCut().incrementAndGet();
                 log.warn("Session is broken, let's reconnect it...");
                 disconnect();
                 connect();

@@ -23,6 +23,8 @@ public class ICAPMessageRepo {
     @Autowired
     private MsgClassifier classifier;
     @Autowired
+    private ServerStatus serverStatus;
+    @Autowired
     private EssentialConfig.EnumConfig enumConfig;
     private ConcurrentLinkedQueue<ICAPMessage> queue = new ConcurrentLinkedQueue();
     private Lock lock = new ReentrantLock();
@@ -36,6 +38,7 @@ public class ICAPMessageRepo {
      * @param message
      */
     public void push(ICAPMessage message) {
+        serverStatus.getRawMessages().incrementAndGet();
         if (isSerialiable(message)) {
             log.info("IConnect API capture a message: {}", message.getId());
             collected.addAndGet(1);

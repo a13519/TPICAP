@@ -2,6 +2,7 @@ package net.zousys.mathtrading.interfaces.tpicap.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.tpicap.ICAPSource;
+import net.zousys.mathtrading.interfaces.tpicap.model.ServerStatus;
 import net.zousys.mathtrading.interfaces.tpicap.model.TradeVault;
 import net.zousys.mathtrading.interfaces.tpicap.repository.TradeVaultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ public class PTFService {
     private boolean readyheartChecking = false;
     @Autowired
     private ICAPSource icapSource;
-
+    @Autowired
+    private ServerStatus serverStatus;
     @Value("${app.tracing.archiving.age}")
     private int ageInDays;
     @Value("${app.tracing.path.success}")
@@ -42,11 +44,19 @@ public class PTFService {
     /**
      *
      */
-    @Scheduled(fixedRateString = "${app.connection.refresh:240000}")
+    @Scheduled(fixedRateString = "${app.session.refresh:240000}")
     private void sessionChecking() {
         if (readyheartChecking) {
             icapSource.checkSession();
         }
+    }
+
+    /**
+     *
+     */
+    @Scheduled(fixedRateString = "${app.session.status:240000}")
+    private void serverStatus() {
+        log.info("Regular status >> "+serverStatus.toString());
     }
 
     /**
