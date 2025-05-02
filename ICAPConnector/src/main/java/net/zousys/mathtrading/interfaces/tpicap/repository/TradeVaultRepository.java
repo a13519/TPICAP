@@ -18,8 +18,6 @@ public interface TradeVaultRepository extends JpaRepository<TradeVaultEntity, In
     public List<TradeVaultEntity> findByTimeOnDate(@Param("date") LocalDate date);
     @Modifying
     @Query("DELETE FROM TradeVaultEntity t WHERE CAST(t.time AS DATE) != :date")
-    void deleteAllExceptDate(@Param("date") LocalDate
-
-                                     date);
+    void deleteAllExceptDate(@Param("date") LocalDate date);
 }
 
