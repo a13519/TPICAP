@@ -1,12 +1,10 @@
-package net.zousys.mathtrading.interfaces.tpicap;
+package net.zousys.mathtrading.interfaces.tpicap.model;
 
-import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.zousys.mathtrading.interfaces.Message;
+import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
 import net.zousys.mathtrading.interfaces.tpicap.config.Constants;
 import net.zousys.mathtrading.interfaces.tpicap.config.EssentialConfig;
-import net.zousys.mathtrading.interfaces.tpicap.model.MsgClassifier;
 import net.zousys.mathtrading.interfaces.tpicap.tracing.ICMessageRecorder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

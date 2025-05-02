@@ -2,18 +2,16 @@ package net.zousys.mathtrading.interfaces.tpicap;
 
 import com.icap.iConnect.srcMsgs.enums.EICErr;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
-import com.icap.iConnect.srcMsgs.iCMsg.ICMsgOrderBookRemove;
-import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeBookRemove;
 import com.icap.iConnect.srcSession.ICCallback;
 import com.icap.iConnect.srcSession.ICSession;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.SessionException;
+import net.zousys.mathtrading.interfaces.tpicap.model.ICAPDispatchQueue;
+import net.zousys.mathtrading.interfaces.tpicap.model.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
-import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -58,7 +56,7 @@ public class ICAPConnector extends Connector implements ICCallback {
                     icapDispatchQueue.await();
                 }
             }
-        }, Executors.newFixedThreadPool(1));
+        }, Executors.newSingleThreadExecutor());
     }
 
     /**
@@ -112,7 +110,6 @@ public class ICAPConnector extends Connector implements ICCallback {
     @Override
     public void onData(ICMsg icMsg, ICSession icSession) {
         ICAPMessage icapMessage = new ICAPMessage(icMsg);
-        log.info("IConnect API capture a message: {}", icapMessage.getId());
         icapMessageRepo.push(icapMessage);
     }
 

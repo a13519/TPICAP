@@ -5,6 +5,7 @@ import com.icap.iConnect.srcMsgs.iCMsg.*;
 import com.icap.iConnect.srcMsgs.iCUtils.ICMessageBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.zousys.mathtrading.interfaces.tpicap.ParsingException;
 import net.zousys.mathtrading.interfaces.util.FileReader;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class RecordableMessage<T extends ICMsg> {
      * @return
      * @throws IOException
      */
-    public static <T extends ICMsg> RecordableMessage parse(String name) throws IOException {
+    public static <T extends ICMsg> RecordableMessage parse(String name) throws IOException, ParsingException {
         return parse(FileReader.readFileToBytes(name));
     }
 
@@ -31,19 +32,22 @@ public class RecordableMessage<T extends ICMsg> {
      * @param data
      * @return
      */
-    public static <T extends ICMsg> RecordableMessage parse(byte[] data) {
-        ByteBuffer bb = ByteBuffer.wrap(data);
-        byte type = bb.get();
-        bb.position(1);
-        ByteBuffer sub = bb.slice();
-        T msg = (T) RecordableMessage.getICMessage(null, EICMsgType.getName((int) type));
-        ICMessageBuffer buffer = new ICMessageBuffer();
-        buffer.put(sub);
-        buffer.flip();
-        buffer.limit(buffer.capacity());
-        msg.unpack(buffer);
-        RecordableMessage rm = new RecordableMessage(msg, System.currentTimeMillis());
-        return rm;
+    public static <T extends ICMsg> RecordableMessage parse(byte[] data) throws ParsingException {
+        try {
+            ByteBuffer bb = ByteBuffer.wrap(data);
+            byte type = bb.get();
+            bb.position(1);
+            ByteBuffer sub = bb.slice();
+            T msg = (T) RecordableMessage.getICMessage(null, EICMsgType.getName((int) type));
+            ICMessageBuffer buffer = new ICMessageBuffer();
+            buffer.put(sub);
+            buffer.flip();
+            buffer.limit(buffer.capacity());
+            msg.unpack(buffer);
+            return  new RecordableMessage(msg, System.currentTimeMillis());
+        } catch (Exception e) {
+            throw new ParsingException("ICMsg parsing exception");
+        }
     }
 
     /**

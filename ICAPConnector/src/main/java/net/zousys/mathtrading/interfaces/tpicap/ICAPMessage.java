@@ -50,7 +50,7 @@ public class ICAPMessage<T> extends RecordableMessage implements Message {
      * @param payload
      * @return
      */
-    public static ICAPMessage form(byte[] payload) {
+    public static ICAPMessage form(byte[] payload) throws ParsingException {
         if (payload != null) {
             RecordableMessage msg = RecordableMessage.parse(payload);
             return new ICAPMessage(msg);

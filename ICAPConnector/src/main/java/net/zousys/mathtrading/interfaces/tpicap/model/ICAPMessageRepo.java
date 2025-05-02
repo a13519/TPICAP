@@ -1,11 +1,10 @@
-package net.zousys.mathtrading.interfaces.tpicap;
+package net.zousys.mathtrading.interfaces.tpicap.model;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.zousys.mathtrading.interfaces.Message;
+import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
 import net.zousys.mathtrading.interfaces.tpicap.config.Constants;
 import net.zousys.mathtrading.interfaces.tpicap.config.EssentialConfig;
-import net.zousys.mathtrading.interfaces.tpicap.model.MsgClassifier;
 import net.zousys.mathtrading.interfaces.tpicap.tracing.ICMessageRecorder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,6 +37,7 @@ public class ICAPMessageRepo {
      */
     public void push(ICAPMessage message) {
         if (isSerialiable(message)) {
+            log.info("IConnect API capture a message: {}", message.getId());
             collected.addAndGet(1);
             queue.add(message);
             lock.lock();

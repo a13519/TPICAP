@@ -4,9 +4,9 @@ import com.icap.iConnect.srcMsgs.enums.EICTradeRequest;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgOrderBookRemove;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeBookRemove;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgTradeRequest;
-import net.zousys.mathtrading.interfaces.Connector;
-import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.tpicap.*;
+import net.zousys.mathtrading.interfaces.tpicap.model.ICAPDispatchQueue;
+import net.zousys.mathtrading.interfaces.tpicap.model.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
 import net.zousys.mathtrading.interfaces.tpicap.model.TradeVault;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Flow;
 
 @Configuration
 public class InterfaceConfiguration {

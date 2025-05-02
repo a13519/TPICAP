@@ -2,7 +2,8 @@ package net.zousys.mathtrading.interfaces.tpicap.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
-import net.zousys.mathtrading.interfaces.tpicap.ICAPMessageRepo;
+import net.zousys.mathtrading.interfaces.tpicap.ParsingException;
+import net.zousys.mathtrading.interfaces.tpicap.model.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.tpicap.ICAPSource;
 import net.zousys.mathtrading.interfaces.util.FileReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +80,11 @@ public class PoolingMonitor {
                         || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                     if (Files.isRegularFile(fullPath)) {
                         log.info("New file detected: " + fullPath);
-                        icapMessageRepo.push(ICAPMessage.form(FileReader.readFileToBytes(fullPath)));
+                        try {
+                            icapMessageRepo.push(ICAPMessage.form(FileReader.readFileToBytes(fullPath)));
+                        } catch (ParsingException e) {
+                            log.warn(e.getLocalizedMessage()+": "+fullPath.getFileName());
+                        }
                         Files.delete(fullPath);
                     } else if (Files.isDirectory(fullPath) && !registeredPaths.contains(fullPath)) {
                         log.warn("New folder detected: " + fullPath);
