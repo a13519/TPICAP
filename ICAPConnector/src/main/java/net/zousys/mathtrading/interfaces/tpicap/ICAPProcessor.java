@@ -15,6 +15,7 @@ import net.zousys.mathtrading.interfaces.tpicap.repository.TradeVaultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -92,33 +93,45 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
      */
     private void bookTrade(ICMsgElectronicTransaction met) {
         ICTradeData td = met.getTradeData();
-        td.getQuantity();
-        td.getBrokerId();
-        td.getComment();
-        td.getCommissionFlag();
-        td.getCommissionValue();
-        td.getCoupon();
-        td.getIssueId();
-        td.getMarketId();
-        td.getMaturityDate();
-        td.getTradeDate();
-        td.getTradeTime();
-        td.getPriceVector();
-        td.getTraderId();
-        td.getTradeType();
-        td.getIssueId().getIssueLengthByType(EICIssueType.eIssueIsin);
-        ICExtension ice = met.getTradeExtension();
-        // TODO
+        if (!tradeVault.contains(td.getTradeId())) {
+            td.getQuantity();
+            td.getBrokerId();
+            td.getComment();
+            td.getCommissionFlag();
+            td.getCommissionValue();
+            td.getCoupon();
+            td.getIssueId();
+            td.getMarketId();
+            td.getMaturityDate();
+            td.getTradeDate();
+            td.getTradeTime();
+            td.getPriceVector();
+            td.getTraderId();
+            td.getTradeType();
+            td.getIssueId().getIssueLengthByType(EICIssueType.eIssueIsin);
+            ICExtension ice = met.getTradeExtension();
+            // TODO
+            addNewTrade(td.getTradeId());
+        } else {
+            log.info("Duplicate trade already booked: "+td.getTradeId());
+        }
+    }
+
+    /**
+     *
+     * @param tradeId
+     */
+    @Transactional
+    public void addNewTrade(String tradeId) {
         tradeVaultRepository.save(
                 TradeVaultEntity.builder()
                         .time(ZonedDateTime.now(zoneId))
-                        .tradeId(td.getTradeId())
+                        .tradeId(tradeId)
                         .status(0)
                         .build()
         );
-        tradeVault.add(td.getTradeId());
+        tradeVault.add(tradeId);
     }
-
     /**
      *
      * @param id

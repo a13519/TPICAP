@@ -37,7 +37,7 @@ public class ICAPMessage <T extends ICMsg> extends RecordableMessage implements 
 
     @Override
     public String getId() {
-        return icMsg.getFirmId()+"."+icMsg.getRequestId()+"."+icMsg.getSequenceNumber() ;
+        return String.join(".",getType(), icMsg.getFirmId(),""+icMsg.getRequestId(),""+icMsg.getSequenceNumber()) ;
     }
 
     /**
