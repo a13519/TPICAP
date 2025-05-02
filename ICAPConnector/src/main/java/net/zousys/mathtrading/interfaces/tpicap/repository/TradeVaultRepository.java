@@ -16,6 +16,7 @@ import java.util.List;
 public interface TradeVaultRepository extends JpaRepository<TradeVaultEntity, Integer> {
     @Query("SELECT t FROM TradeVaultEntity t WHERE FUNCTION('DATE', t.time) = :date")
     public List<TradeVaultEntity> findByTimeOnDate(@Param("date") LocalDate date);
+
     @Modifying
     @Query("DELETE FROM TradeVaultEntity t WHERE CAST(t.time AS DATE) != :date")
     void deleteAllExceptDate(@Param("date") LocalDate date);

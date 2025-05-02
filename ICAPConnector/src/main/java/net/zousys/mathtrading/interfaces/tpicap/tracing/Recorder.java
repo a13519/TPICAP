@@ -19,14 +19,16 @@ import java.util.concurrent.ExecutorService;
 @Slf4j
 public class Recorder {
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     protected static final String dateTag() {
         return LocalDate.now().format(formatter);
     }
+
     protected static final String messageId(long time, String type) {
         return time + "_" + type;
     }
+
     /**
-     *
      * @param message
      * @param root
      * @param executorService
@@ -36,7 +38,7 @@ public class Recorder {
             try {
                 Path subroot = root.resolve(dateTag());
                 Files.createDirectories(subroot);
-                Path filepath = subroot.resolve(messageId(message.getTime(), message.getType())+".irm");
+                Path filepath = subroot.resolve(messageId(message.getTime(), message.getType()) + ".irm");
                 Files.write(filepath, message.serialize()); // Write byte array to file
                 filepath.toFile().setLastModified(message.getTime());
                 log.info("Message was recorded: " + filepath);

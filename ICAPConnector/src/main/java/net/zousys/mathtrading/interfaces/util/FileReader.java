@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 public class FileReader {
 
     /**
-     *
      * @param filePath
      * @return
      * @throws IOException
@@ -23,7 +22,6 @@ public class FileReader {
     }
 
     /**
-     *
      * @param name
      * @return
      * @throws IOException
@@ -33,7 +31,6 @@ public class FileReader {
     }
 
     /**
-     *
      * @param is
      * @return
      * @throws IOException

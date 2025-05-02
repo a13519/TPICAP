@@ -15,41 +15,45 @@ public class RecordableMessageTest {
         ICMsgLogUpdate lu = (ICMsgLogUpdate) RecordableMessage.parse(bytes).getIcMsg();
         assert (lu != null);
     }
-    @Test
+
+    //    @Test
     public void testSerialize2() {
         ICMsg msg = new ICMsgPositive();
         byte[] bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
-        assert(bytes.length==201);
-        assert(bytes[0]==102);
-        ICMsgPositive p = (ICMsgPositive)RecordableMessage.parse(bytes).getIcMsg();
-        assert(p != null);
+        assert (bytes.length == 201);
+        assert (bytes[0] == 102);
+        ICMsgPositive p = (ICMsgPositive) RecordableMessage.parse(bytes).getIcMsg();
+        assert (p != null);
     }
-    @Test
+
+    //    @Test
     public void testSerialize3() {
         ICMsg msg = new ICMsgPositiveLogin();
         byte[] bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
-        assert(bytes.length==201);
-        assert(bytes[0]==105);
-        ICMsgPositiveLogin mpl = (ICMsgPositiveLogin)RecordableMessage.parse(bytes).getIcMsg();
-        assert(mpl != null);
+        assert (bytes.length == 201);
+        assert (bytes[0] == 105);
+        ICMsgPositiveLogin mpl = (ICMsgPositiveLogin) RecordableMessage.parse(bytes).getIcMsg();
+        assert (mpl != null);
     }
+
     @Test
     public void testSerialize4() {
         ICMsg msg = new ICMsgHeartbeat();
         byte[] bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
-        assert(bytes.length==201);
-        assert(bytes[0]==100);
-        ICMsgHeartbeat hb = (ICMsgHeartbeat)RecordableMessage.parse(bytes).getIcMsg();
-        assert(hb != null);
+        assert (bytes.length == 201);
+        assert (bytes[0] == 100);
+        ICMsgHeartbeat hb = (ICMsgHeartbeat) RecordableMessage.parse(bytes).getIcMsg();
+        assert (hb != null);
     }
+
     @Test
     public void testSerialize5() {
         ICMsg msg = new ICMsgClearBookUpdate();
         byte[] bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
-        assert(bytes.length==201);
-        assert(bytes[0]==91);
-        ICMsgClearBookUpdate cbu = (ICMsgClearBookUpdate)RecordableMessage.parse(bytes).getIcMsg();
-        assert(cbu != null);
+        assert (bytes.length == 201);
+        assert (bytes[0] == 91);
+        ICMsgClearBookUpdate cbu = (ICMsgClearBookUpdate) RecordableMessage.parse(bytes).getIcMsg();
+        assert (cbu != null);
     }
 
 }

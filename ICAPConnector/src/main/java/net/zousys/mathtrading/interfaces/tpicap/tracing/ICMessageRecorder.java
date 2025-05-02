@@ -33,8 +33,8 @@ public class ICMessageRecorder extends Recorder {
     private ExecutorService recorderService;
     @Value("${app.tracing.message.detailed}")
     private boolean detailed;
+
     /**
-     *
      * @param msg
      * @return
      */
@@ -43,8 +43,8 @@ public class ICMessageRecorder extends Recorder {
         if (enumConfig.getContentLevel() != Constants.ContentLevel.NONE) {
             EICMsgType msgType = msg.icMsg.getMsgType();
             if (classifier.isQualified(msgType.name())
-                    ||enumConfig.getContentLevel()== Constants.ContentLevel.INBOUND
-                    ||enumConfig.getContentLevel()== Constants.ContentLevel.OUTBOUND) {
+                    || enumConfig.getContentLevel() == Constants.ContentLevel.INBOUND
+                    || enumConfig.getContentLevel() == Constants.ContentLevel.OUTBOUND) {
                 switch (msgType) {
                     case EICMsgType.eMsgHeartbeat -> {
                         break;
@@ -94,7 +94,6 @@ public class ICMessageRecorder extends Recorder {
     }
 
     /**
-     *
      * @param msg
      * @return
      */
@@ -105,7 +104,6 @@ public class ICMessageRecorder extends Recorder {
 
 
     /**
-     *
      * @param msgRef
      */
     private static final void doMsgPositiveLogin(ICMsg msgRef, boolean detailed) {

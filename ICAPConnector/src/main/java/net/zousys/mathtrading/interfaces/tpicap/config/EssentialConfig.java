@@ -28,6 +28,7 @@ public class EssentialConfig {
     private int poolRecorder;
     @Value("${app.timezone}")
     private String timezone;
+
     /**
      * @return
      */
@@ -35,6 +36,7 @@ public class EssentialConfig {
     public ExecutorService collectorService() {
         return Executors.newFixedThreadPool(poolConnector);
     }
+
     /**
      * @return
      */
@@ -42,14 +44,15 @@ public class EssentialConfig {
     public ExecutorService monitorService() {
         return Executors.newSingleThreadExecutor();
     }
+
     /**
-     *
      * @return
      */
     @Bean
     public ExecutorService recorderService() {
         return Executors.newFixedThreadPool(poolRecorder);
     }
+
     /**
      * @return
      */

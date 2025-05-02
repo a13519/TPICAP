@@ -1,5 +1,6 @@
 package net.zousys.mathtrading.interfaces.tpicap;
 
+import com.icap.iConnect.srcMsgs.enums.EICMsgType;
 import com.icap.iConnect.srcMsgs.iCMsg.*;
 import com.icap.iConnect.srcMsgs.iCUtils.ICMessageBuffer;
 import net.zousys.mathtrading.interfaces.Message;
@@ -8,9 +9,8 @@ import net.zousys.mathtrading.interfaces.tpicap.tracing.RecordableMessage;
 /**
  *
  */
-public class ICAPMessage <T extends ICMsg> extends RecordableMessage implements Message {
+public class ICAPMessage<T> extends RecordableMessage implements Message {
     /**
-     *
      * @param icMsg
      */
     public ICAPMessage(ICMsg icMsg) {
@@ -18,7 +18,6 @@ public class ICAPMessage <T extends ICMsg> extends RecordableMessage implements 
     }
 
     /**
-     *
      * @param rMsg
      */
     public ICAPMessage(RecordableMessage rMsg) {
@@ -26,8 +25,15 @@ public class ICAPMessage <T extends ICMsg> extends RecordableMessage implements 
     }
 
     @Override
-    public <T extends ICMsg> T message() {
+    public <T> T message() {
         return (T) getIcMsg();
+    }
+
+    /**
+     * @return
+     */
+    public EICMsgType getICType() {
+        return icMsg.getMsgType();
     }
 
     @Override
@@ -37,7 +43,7 @@ public class ICAPMessage <T extends ICMsg> extends RecordableMessage implements 
 
     @Override
     public String getId() {
-        return String.join(".",getType(), icMsg.getFirmId(),""+icMsg.getRequestId(),""+icMsg.getSequenceNumber()) ;
+        return String.join(".", getType(), icMsg.getFirmId(), "" + icMsg.getRequestId(), "" + icMsg.getSequenceNumber());
     }
 
     /**

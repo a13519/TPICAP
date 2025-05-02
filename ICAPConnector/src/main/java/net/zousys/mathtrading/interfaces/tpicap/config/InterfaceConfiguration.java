@@ -50,7 +50,6 @@ public class InterfaceConfiguration {
     }
 
     /**
-     *
      * @return
      */
     @Bean
@@ -82,7 +81,6 @@ public class InterfaceConfiguration {
     }
 
     /**
-     *
      * @return
      */
     @Bean

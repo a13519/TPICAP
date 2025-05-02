@@ -30,7 +30,6 @@ public class ICAPConnector extends Connector implements ICCallback {
     public Boolean started = false;
 
     /**
-     *
      * @param serverSignature
      * @param icapMessageRepo
      * @param initCommands

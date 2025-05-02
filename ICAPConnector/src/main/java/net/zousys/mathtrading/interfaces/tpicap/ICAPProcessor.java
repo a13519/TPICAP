@@ -3,6 +3,7 @@ package net.zousys.mathtrading.interfaces.tpicap;
 import com.icap.iConnect.srcMsgs.enums.EICIssueType;
 import com.icap.iConnect.srcMsgs.enums.EICMsgType;
 import com.icap.iConnect.srcMsgs.iCMsg.ICExtension;
+import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgElectronicTransaction;
 import com.icap.iConnect.srcMsgs.iCMsg.ICTradeData;
 import lombok.Getter;
@@ -55,18 +56,17 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
     }
 
     /**
-     *
      * @param message
      */
     @Override
     public void onNext(Message message) {
         if (active) {
             log.info("PROCESS ------ {}", message.getId());
-            log.info("\n"+message.toString());
-            switch (message.message().getMsgType()) {
+            log.info("\n" + message.toString());
+            switch (((ICAPMessage) message).getICType()) {
                 case EICMsgType.eMsgElectronicTransaction: {
                     CompletableFuture.runAsync(() -> {
-                        bookTrade((ICMsgElectronicTransaction)message.message());
+                        bookTrade((ICMsgElectronicTransaction) message.message());
                     }, processorService);
                     break;
                 }
@@ -88,7 +88,6 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
     }
 
     /**
-     *
      * @param met
      */
     private void bookTrade(ICMsgElectronicTransaction met) {
@@ -113,12 +112,11 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
             // TODO
             addNewTrade(td.getTradeId());
         } else {
-            log.info("Duplicate trade already booked: "+td.getTradeId());
+            log.info("Duplicate trade already booked: " + td.getTradeId());
         }
     }
 
     /**
-     *
      * @param tradeId
      */
     @Transactional
@@ -132,8 +130,8 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
         );
         tradeVault.add(tradeId);
     }
+
     /**
-     *
      * @param id
      */
     private void acknoledge(String id) {

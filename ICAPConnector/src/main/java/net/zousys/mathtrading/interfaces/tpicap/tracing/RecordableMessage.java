@@ -9,25 +9,25 @@ import net.zousys.mathtrading.interfaces.util.FileReader;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
 @AllArgsConstructor
-public class RecordableMessage <T extends ICMsg> {
+public class RecordableMessage<T extends ICMsg> {
     @Getter
     protected T icMsg;
     @Getter
     protected long time;
 
     /**
-     *
      * @param name
-     * @return
      * @param <T>
+     * @return
      * @throws IOException
      */
     public static <T extends ICMsg> RecordableMessage parse(String name) throws IOException {
         return parse(FileReader.readFileToBytes(name));
     }
+
     /**
-     *
      * @param data
      * @return
      */
@@ -36,7 +36,7 @@ public class RecordableMessage <T extends ICMsg> {
         byte type = bb.get();
         bb.position(1);
         ByteBuffer sub = bb.slice();
-        T msg = (T) RecordableMessage.getICMessage(null, EICMsgType.getName((int)type));
+        T msg = (T) RecordableMessage.getICMessage(null, EICMsgType.getName((int) type));
         ICMessageBuffer buffer = new ICMessageBuffer();
         buffer.put(sub);
         buffer.flip();
@@ -47,19 +47,17 @@ public class RecordableMessage <T extends ICMsg> {
     }
 
     /**
-     *
      * @return
      */
     public byte[] serialize() {
         ByteBuffer mbb = getByteBuffer();
-        ByteBuffer bb = ByteBuffer.allocate(mbb.capacity()+1);
-        bb.put((byte)icMsg.getMsgType().getValue());
+        ByteBuffer bb = ByteBuffer.allocate(mbb.capacity() + 1);
+        bb.put((byte) icMsg.getMsgType().getValue());
         bb.put(mbb);
         return bb.array();
     }
 
     /**
-     *
      * @return
      */
     public final ByteBuffer getByteBuffer() {
@@ -69,45 +67,44 @@ public class RecordableMessage <T extends ICMsg> {
     }
 
     /**
-     *
-     * @return
      * @param <T>
+     * @return
      */
     @SuppressWarnings("unchecked")
     public static final <T extends ICMsg> T getICMessage(ICMsg icMsg, EICMsgType msgtype) {
-        if (icMsg==null && msgtype == null){
+        if (icMsg == null && msgtype == null) {
             return null;
         }
         EICMsgType type = icMsg == null ? msgtype : icMsg.getMsgType();
         switch (type) {
             case EICMsgType.eMsgPositiveLogin: {
-                return icMsg==null? (T) new ICMsgPositiveLogin():(T) ((ICMsgPositiveLogin) icMsg);
+                return icMsg == null ? (T) new ICMsgPositiveLogin() : (T) ((ICMsgPositiveLogin) icMsg);
             }
             case EICMsgType.eMsgClearBook: {
-                return icMsg==null? (T) new ICMsgClearBookUpdate():(T) ((ICMsgClearBookUpdate)icMsg);
+                return icMsg == null ? (T) new ICMsgClearBookUpdate() : (T) ((ICMsgClearBookUpdate) icMsg);
             }
             case EICMsgType.eMsgMessageLogUpdate: {
-                return icMsg==null? (T) new ICMsgLogUpdate():(T) ((ICMsgLogUpdate)icMsg);
+                return icMsg == null ? (T) new ICMsgLogUpdate() : (T) ((ICMsgLogUpdate) icMsg);
             }
             case EICMsgType.eMsgPositive: {
-                return icMsg==null? (T) new ICMsgPositive():(T) ((ICMsgPositive) icMsg);
+                return icMsg == null ? (T) new ICMsgPositive() : (T) ((ICMsgPositive) icMsg);
             }
             case EICMsgType.eMsgHeartbeat: {
-                return icMsg==null? (T) new ICMsgHeartbeat():(T) ((ICMsgHeartbeat) icMsg);
+                return icMsg == null ? (T) new ICMsgHeartbeat() : (T) ((ICMsgHeartbeat) icMsg);
             }
             case EICMsgType.eMsgElectronicTransaction: {
-                return icMsg==null? (T) new ICMsgElectronicTransaction():(T) ((ICMsgElectronicTransaction) icMsg);
+                return icMsg == null ? (T) new ICMsgElectronicTransaction() : (T) ((ICMsgElectronicTransaction) icMsg);
             }
             default: {
-                return icMsg==null? (T) new ICMsg():(T) icMsg;
+                return icMsg == null ? (T) new ICMsg() : (T) icMsg;
             }
         }
     }
 
 
-        public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
-        }
+    }
 
 
 }

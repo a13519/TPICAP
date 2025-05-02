@@ -38,14 +38,14 @@ public class ICAPMessageRepo {
      */
     public void push(ICAPMessage message) {
         if (isSerialiable(message)) {
-                collected.addAndGet(1);
-                queue.add(message);
-                lock.lock();
-                try {
-                    write.signalAll();
-                } finally {
-                    lock.unlock();
-                }
+            collected.addAndGet(1);
+            queue.add(message);
+            lock.lock();
+            try {
+                write.signalAll();
+            } finally {
+                lock.unlock();
+            }
             icMessageRecorder.record(message);
         }
     }

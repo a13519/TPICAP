@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
  */
 public class MessageLogGenerator {
     /**
-     *
      * @param detailed
      * @param msg
      * @param strName
@@ -39,7 +38,6 @@ public class MessageLogGenerator {
     }
 
     /**
-     *
      * @param detailed
      * @param msg
      * @param strName
@@ -51,7 +49,6 @@ public class MessageLogGenerator {
     }
 
     /**
-     *
      * @param detailed
      * @param msg
      * @param strName
@@ -62,7 +59,6 @@ public class MessageLogGenerator {
     }
 
     /**
-     *
      * @param detailed
      * @param msg
      * @param strName
@@ -79,7 +75,6 @@ public class MessageLogGenerator {
     }
 
     /**
-     *
      * @param detailed
      * @param msg
      * @param strName
@@ -101,7 +96,6 @@ public class MessageLogGenerator {
     }
 
     /**
-     *
      * @param detailed
      * @param msg
      * @param strName
@@ -112,7 +106,6 @@ public class MessageLogGenerator {
     }
 
     /**
-     *
      * @param detailed
      * @param extension
      * @param strName
@@ -120,7 +113,7 @@ public class MessageLogGenerator {
      * @return
      */
     public static final String generateExtensionLog(boolean detailed, ICExtension extension, String strName,
-                                       String strLog) {
+                                                    String strLog) {
         StringBuffer sBuff = new StringBuffer();
         sBuff.append(strName);
         sBuff.append(" [" + extension.getExtensionType() + "]   ");

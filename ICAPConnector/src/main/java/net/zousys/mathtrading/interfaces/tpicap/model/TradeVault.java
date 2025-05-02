@@ -13,22 +13,20 @@ public class TradeVault {
     private Set<String> tradeSet = ConcurrentHashMap.newKeySet();
 
     /**
-     *
      * @param icapTradeId
      */
     public void add(String icapTradeId) {
-        if (icapTradeId!= null) {
+        if (icapTradeId != null) {
             tradeSet.add(icapTradeId);
         }
     }
 
     /**
-     *
      * @param icapTradeId
      * @return
      */
     public boolean contains(String icapTradeId) {
-        if (icapTradeId!= null) {
+        if (icapTradeId != null) {
             return tradeSet.contains(icapTradeId);
         }
         return false;
