@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
@@ -25,6 +26,8 @@ public class EssentialConfig {
     private int poolProcessor;
     @Value("${app.pool.recorder}")
     private int poolRecorder;
+    @Value("${app.timezone}")
+    private String timezone;
     /**
      * @return
      */
@@ -81,5 +84,10 @@ public class EssentialConfig {
     public static class EnumConfig {
         private Constants.ContentLevel contentLevel;
         private Constants.SerializeLevel serializeLevel;
+    }
+
+    @Bean
+    public ZoneId zoneId() {
+        return ZoneId.of(timezone);
     }
 }

@@ -5,11 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Connector;
 import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.Source;
+import net.zousys.mathtrading.interfaces.tpicap.repository.TradeVaultRepository;
+import net.zousys.mathtrading.interfaces.tpicap.service.PTFService;
+import net.zousys.mathtrading.interfaces.tpicap.service.TradeVaultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -23,11 +29,12 @@ import java.util.stream.IntStream;
 @Slf4j
 @Component
 public class ICAPSource implements Source {
-
     @Value("${app.pool.connector}")
     private int poolConnector;
     @Autowired
     private ICAPMessageRepo icapMessageRepo;
+    @Autowired
+    private TradeVaultService tradeVaultService;
     private ExecutorService collectorService;
     private ExecutorService processorService;
     private Flow.Subscriber<Message> subscriber;
@@ -85,6 +92,7 @@ public class ICAPSource implements Source {
      */
     @Scheduled(cron = "${app.session.begin}", zone = "America/New_York")
     public void restartTheSessionTask() {
+        tradeVaultService.reloadTradeVault();
         Arrays.stream(connectors).forEach(con -> {
             if (con.getIcapSessionManager().getIcSession().isConnected()) {
                 con.disconnect();

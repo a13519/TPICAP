@@ -1,10 +1,18 @@
 package net.zousys.mathtrading.interfaces.tpicap.config;
 
 import jakarta.annotation.PostConstruct;
+import net.zousys.mathtrading.interfaces.tpicap.model.TradeVault;
+import net.zousys.mathtrading.interfaces.tpicap.repository.TradeVaultRepository;
+import net.zousys.mathtrading.interfaces.tpicap.service.PTFService;
+import net.zousys.mathtrading.interfaces.tpicap.service.TradeVaultService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Component
 public class PostConstructor {
@@ -20,6 +28,14 @@ public class PostConstructor {
     private String pooling;
     @Value("${app.tracing.archiving.path}")
     private String archiverPath;
+    @Autowired
+    private TradeVaultRepository tradeVaultRepository;
+    @Autowired
+    private TradeVault tradeVault;
+    @Autowired
+    private ZoneId zoneId;
+    @Autowired
+    private TradeVaultService tradeVaultService;
 
     @PostConstruct
     public void construct() {
@@ -47,5 +63,7 @@ public class PostConstructor {
         if (!archiverFile.exists()) {
             archiverFile.mkdirs();
         }
+        tradeVaultService.reloadTradeVault();
     }
+
 }

@@ -33,4 +33,11 @@ public class TradeVault {
         }
         return false;
     }
+
+    /**
+     *
+     */
+    public void clear() {
+        tradeSet.clear();
+    }
 }

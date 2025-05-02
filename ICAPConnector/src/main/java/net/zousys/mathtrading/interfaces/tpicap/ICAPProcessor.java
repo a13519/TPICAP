@@ -9,10 +9,16 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Message;
+import net.zousys.mathtrading.interfaces.tpicap.entity.TradeVaultEntity;
+import net.zousys.mathtrading.interfaces.tpicap.model.TradeVault;
+import net.zousys.mathtrading.interfaces.tpicap.repository.TradeVaultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,23 +37,26 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
     private String pendingPath;
     @Value("${app.tracing.path.failure}")
     private String failurePath;
+    @Value("${app.ackOnBooking}")
+    private boolean ackOnBooking;
     @Autowired
     private ExecutorService processorService;
+    @Autowired
+    private TradeVaultRepository tradeVaultRepository;
+    @Autowired
+    private TradeVault tradeVault;
+    @Autowired
+    private ZoneId zoneId;
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
 
     }
 
-//            IntStream.range(0, poolProcessor).forEach(i -> CompletableFuture.runAsync(() -> {
-//        while (true) {
-//            if (!icapMessageRepo.isEmpty()) {
-//                subscriber.onNext(icapMessageRepo.poll());
-//            } else {
-//                icapMessageRepo.await();
-//            }
-//        }
-//    }, processorService));
+    /**
+     *
+     * @param message
+     */
     @Override
     public void onNext(Message message) {
         if (active) {
@@ -77,6 +86,10 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
 
     }
 
+    /**
+     *
+     * @param met
+     */
     private void bookTrade(ICMsgElectronicTransaction met) {
         ICTradeData td = met.getTradeData();
         td.getQuantity();
@@ -96,8 +109,23 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
         td.getIssueId().getIssueLengthByType(EICIssueType.eIssueIsin);
         ICExtension ice = met.getTradeExtension();
         // TODO
+        tradeVaultRepository.save(
+                TradeVaultEntity.builder()
+                        .time(ZonedDateTime.now(zoneId))
+                        .tradeId(td.getTradeId())
+                        .status(0)
+                        .build()
+        );
+        tradeVault.add(td.getTradeId());
     }
+
+    /**
+     *
+     * @param id
+     */
     private void acknoledge(String id) {
-        // TODO
+        if (ackOnBooking) {
+            // TODO
+        }
     }
 }

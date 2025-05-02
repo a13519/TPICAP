@@ -12,6 +12,8 @@ spring:
   h2:
     console:
       enabled: true
+      spring:
+      path: /h2-console
   jpa:
     show-sql: false
     hibernate:
@@ -39,6 +41,7 @@ app:
     refresh: 240000
   session:
     begin: "0 0 6 * * *"  # 6:00 AM daily in prod EDT time
+    end: "0 0 20 * * *"  # 20:00 PM daily in prod EDT time
   pool:
     connector: 1           # Connector pool size
     processor: 4           # processor pool size
@@ -66,7 +69,8 @@ app:
   pooling:
     active: true
     path: tracing/pooling              # pooling forlder for testing
-
+  ackOnBooking: false
+  timezone: "America/New_York"
 
 management:
   endpoints:

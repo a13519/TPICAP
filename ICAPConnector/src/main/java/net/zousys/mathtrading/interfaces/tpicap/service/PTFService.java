@@ -2,12 +2,17 @@ package net.zousys.mathtrading.interfaces.tpicap.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.tpicap.ICAPSource;
+import net.zousys.mathtrading.interfaces.tpicap.model.TradeVault;
+import net.zousys.mathtrading.interfaces.tpicap.repository.TradeVaultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 @Slf4j
