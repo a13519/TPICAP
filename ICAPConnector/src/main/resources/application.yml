@@ -61,7 +61,7 @@ app:
       serialize-level: BUSINESS       # ALL: business message and session message
       # BUSINESS: business message only
       content-level: INBOUND        # NONE: Nothing to trace (not recommended)
-        # BUSINESS: businesss only
+      # BUSINESS: businesss only
       # INBOUND: inbound message only
       # OUTBOUND: includes outbound
       detailed: true        # to log message content

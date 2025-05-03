@@ -44,7 +44,7 @@ public class RecordableMessage<T extends ICMsg> {
             buffer.flip();
             buffer.limit(buffer.capacity());
             msg.unpack(buffer);
-            return  new RecordableMessage(msg, System.currentTimeMillis());
+            return new RecordableMessage(msg, System.currentTimeMillis());
         } catch (Exception e) {
             throw new ParsingException("ICMsg parsing exception");
         }

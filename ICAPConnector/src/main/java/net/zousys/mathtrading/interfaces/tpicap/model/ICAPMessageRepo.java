@@ -1,6 +1,5 @@
 package net.zousys.mathtrading.interfaces.tpicap.model;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
 import net.zousys.mathtrading.interfaces.tpicap.config.Constants;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -29,10 +27,6 @@ public class ICAPMessageRepo {
     private ConcurrentLinkedQueue<ICAPMessage> queue = new ConcurrentLinkedQueue();
     private Lock lock = new ReentrantLock();
     private Condition write = lock.newCondition();
-    @Getter
-    private AtomicLong collected = new AtomicLong(0l);
-    @Getter
-    private AtomicLong consumed = new AtomicLong(0l);
 
     /**
      * @param message
@@ -41,7 +35,6 @@ public class ICAPMessageRepo {
         serverStatus.getRawMessages().incrementAndGet();
         if (isSerialiable(message)) {
             log.info("IConnect API capture a message: {}", message.getId());
-            collected.addAndGet(1);
             queue.add(message);
             lock.lock();
             try {
@@ -78,7 +71,6 @@ public class ICAPMessageRepo {
      * @return
      */
     public ICAPMessage poll() {
-        consumed.addAndGet(1);
         return queue.poll();
     }
 

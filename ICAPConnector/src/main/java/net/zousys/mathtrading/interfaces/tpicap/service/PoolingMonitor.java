@@ -2,9 +2,9 @@ package net.zousys.mathtrading.interfaces.tpicap.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
+import net.zousys.mathtrading.interfaces.tpicap.ICAPSource;
 import net.zousys.mathtrading.interfaces.tpicap.ParsingException;
 import net.zousys.mathtrading.interfaces.tpicap.model.ICAPMessageRepo;
-import net.zousys.mathtrading.interfaces.tpicap.ICAPSource;
 import net.zousys.mathtrading.interfaces.tpicap.model.ServerStatus;
 import net.zousys.mathtrading.interfaces.util.FileReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +38,7 @@ public class PoolingMonitor {
     private ICAPMessageRepo icapMessageRepo;
     @Autowired
     private ServerStatus serverStatus;
+
     /**
      *
      */
@@ -86,7 +87,7 @@ public class PoolingMonitor {
                         try {
                             icapMessageRepo.push(ICAPMessage.form(FileReader.readFileToBytes(fullPath)));
                         } catch (ParsingException e) {
-                            log.warn(e.getLocalizedMessage()+": "+fullPath.getFileName());
+                            log.warn(e.getLocalizedMessage() + ": " + fullPath.getFileName());
                         }
                         Files.delete(fullPath);
                     } else if (Files.isDirectory(fullPath) && !registeredPaths.contains(fullPath)) {

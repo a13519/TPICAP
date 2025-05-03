@@ -5,6 +5,7 @@ import lombok.ToString;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
 @Getter
 @ToString
 @Component

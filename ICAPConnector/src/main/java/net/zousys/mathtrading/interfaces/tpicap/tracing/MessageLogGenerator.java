@@ -3,8 +3,6 @@ package net.zousys.mathtrading.interfaces.tpicap.tracing;
 import com.icap.iConnect.srcMsgs.iCMsg.ICExtension;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcMsgs.iCMsg.ICMsgResponse;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 /**
  *

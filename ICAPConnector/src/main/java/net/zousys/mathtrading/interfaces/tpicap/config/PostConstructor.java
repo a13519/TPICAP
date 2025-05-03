@@ -3,16 +3,13 @@ package net.zousys.mathtrading.interfaces.tpicap.config;
 import jakarta.annotation.PostConstruct;
 import net.zousys.mathtrading.interfaces.tpicap.model.TradeVault;
 import net.zousys.mathtrading.interfaces.tpicap.repository.TradeVaultRepository;
-import net.zousys.mathtrading.interfaces.tpicap.service.PTFService;
 import net.zousys.mathtrading.interfaces.tpicap.service.TradeVaultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 @Component
 public class PostConstructor {

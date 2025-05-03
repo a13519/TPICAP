@@ -1,6 +1,5 @@
 package net.zousys.mathtrading.interfaces.tpicap.model;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
 import net.zousys.mathtrading.interfaces.tpicap.config.Constants;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -32,8 +30,6 @@ public class ICAPDispatchQueue {
     private ConcurrentLinkedQueue<ICAPMessage> queue = new ConcurrentLinkedQueue();
     private Lock lock = new ReentrantLock();
     private Condition write = lock.newCondition();
-    @Getter
-    private AtomicLong total = new AtomicLong(0l);
 
     /**
      * @param messages
@@ -47,7 +43,6 @@ public class ICAPDispatchQueue {
      */
     public void push(ICAPMessage message) {
         if (message != null) {
-            total.addAndGet(1);
             queue.add(message);
             lock.lock();
             try {
@@ -86,7 +81,6 @@ public class ICAPDispatchQueue {
      * @return
      */
     public ICAPMessage poll() {
-        total.addAndGet(1);
         return queue.poll();
     }
 

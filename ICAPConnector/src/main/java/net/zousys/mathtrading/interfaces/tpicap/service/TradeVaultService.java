@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 @Service
 public class TradeVaultService {
@@ -19,6 +18,9 @@ public class TradeVaultService {
     @Autowired
     private TradeVault tradeVault;
 
+    /**
+     *
+     */
     @Transactional
     public void reloadTradeVault() {
         LocalDate localDate = LocalDate.now(zoneId);

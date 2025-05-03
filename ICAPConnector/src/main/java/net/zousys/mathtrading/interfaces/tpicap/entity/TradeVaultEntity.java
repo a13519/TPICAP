@@ -1,6 +1,9 @@
 package net.zousys.mathtrading.interfaces.tpicap.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.ZonedDateTime;
@@ -17,8 +20,6 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class TradeVaultEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int unitedid;
     private String tradeId;          // ticker
     private ZonedDateTime time;
     private int status;

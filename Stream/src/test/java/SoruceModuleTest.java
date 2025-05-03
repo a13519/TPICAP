@@ -1,10 +1,10 @@
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.cloud.stream.messaging.Source;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.test.annotation.DirtiesContext;
 
 @SpringBootTest
 @EmbeddedKafka(

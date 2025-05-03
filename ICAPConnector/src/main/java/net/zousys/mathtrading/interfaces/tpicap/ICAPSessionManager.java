@@ -2,14 +2,12 @@ package net.zousys.mathtrading.interfaces.tpicap;
 
 import com.icap.iConnect.srcMsgs.enums.EICCompressionType;
 import com.icap.iConnect.srcMsgs.enums.EICErr;
-import com.icap.iConnect.srcMsgs.iCMsg.ICMsg;
 import com.icap.iConnect.srcSession.ICCallback;
 import com.icap.iConnect.srcSession.ICSession;
 import com.icap.iConnect.srcSession.ICSessionMngr;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.zousys.mathtrading.interfaces.Message;
 import net.zousys.mathtrading.interfaces.SessionException;
 import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
 import net.zousys.mathtrading.interfaces.tpicap.tracing.ICMessageRecorder;

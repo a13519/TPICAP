@@ -1,7 +1,6 @@
 package com.sc.race.asl;
 
 import com.icap.iConnect.srcMsgs.iCMsg.*;
-import com.icap.iConnect.srcMsgs.iCUtils.ICMessageBuffer;
 import net.zousys.mathtrading.interfaces.tpicap.tracing.RecordableMessage;
 import org.junit.jupiter.api.Test;
 

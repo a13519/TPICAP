@@ -48,6 +48,7 @@ public class ICAPProcessor implements Flow.Subscriber<Message> {
     private ZoneId zoneId;
     @Autowired
     private ServerStatus serverStatus;
+
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
 
