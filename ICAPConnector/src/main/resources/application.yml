@@ -25,7 +25,6 @@ spring:
   sql:
     init:
       mode: never
-
 server:
   port: 11003
 
@@ -39,12 +38,11 @@ app:
     key: devscrpstpic
     value: test
   session:
-    begin: "0 0 6 * * *"  # 6:00 AM daily in prod EDT time
-    end: "0 0 20 * * *"  # 20:00 PM daily in prod EDT time
+    begin: "0 0 6 * * *"    # 6:00 AM daily in prod EDT time
+    end: "0 0 20 * * *"     # 20:00 PM daily in prod EDT time
     refresh: 240000
     status: 240000
   pool:
-    connector: 1           # Connector pool size
     processor: 4           # processor pool size
     recorder: 5            # recorder pool size
   tracing:
@@ -58,15 +56,19 @@ app:
       interval: 86400000
       path: archive
     message:
-      serialize-level: BUSINESS       # ALL: business message and session message
+      # ALL: business message and session message
       # BUSINESS: business message only
-      content-level: INBOUND        # NONE: Nothing to trace (not recommended)
+      serialize-level: BUSINESS
+      # NONE: Nothing to trace (not recommended)
       # BUSINESS: businesss only
       # INBOUND: inbound message only
       # OUTBOUND: includes outbound
-      detailed: true        # to log message content
-      housekeeping: 0       # 0: no housekeeping
+      content-level: INBOUND
+      # to log message content
+      detailed: true
+      # 0: no housekeeping
       # n: days to clean
+      housekeeping: 0
   pooling:
     active: true
     path: tracing/pooling              # pooling forlder for testing

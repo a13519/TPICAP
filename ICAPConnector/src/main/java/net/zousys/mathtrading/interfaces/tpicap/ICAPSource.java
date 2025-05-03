@@ -33,7 +33,6 @@ public class ICAPSource implements Source {
     private ICAPMessageRepo icapMessageRepo;
     @Autowired
     private TradeVaultService tradeVaultService;
-    private ExecutorService collectorService;
     private ExecutorService processorService;
     private Flow.Subscriber<Message> subscriber;
     private ICAPConnector[] connectors;
@@ -47,11 +46,9 @@ public class ICAPSource implements Source {
     @Autowired
     public ICAPSource(
             ICAPConnector[] connectors,
-            ExecutorService collectorService,
             ExecutorService processorService,
             Flow.Subscriber<Message> subscriber) {
         this.connectors = connectors;
-        this.collectorService = collectorService;
         this.processorService = processorService;
         this.subscriber = subscriber;
     }
