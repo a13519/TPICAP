@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public abstract class Connector {
     private ConcurrentLinkedQueue<Message> queue;
 
-    public abstract void connect();
+    public abstract void connect() throws SessionException;
 
     public abstract void disconnect();
 

@@ -3,6 +3,7 @@ package net.zousys.mathtrading.interfaces.tpicap;
 
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.Message;
+import net.zousys.mathtrading.interfaces.SessionException;
 import net.zousys.mathtrading.interfaces.Source;
 import net.zousys.mathtrading.interfaces.tpicap.model.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.tpicap.model.ServerStatus;
@@ -62,7 +63,7 @@ public class ICAPSource implements Source {
     public void startDeamon() {
         try {
             connectors[0].connect();
-        } catch (RuntimeException re) {
+        } catch (SessionException re) {
             log.error("Exception from connector connect: " + re.getLocalizedMessage());
         }
         CompletableFuture.runAsync(() -> {
@@ -92,10 +93,14 @@ public class ICAPSource implements Source {
         tradeVaultService.reloadTradeVault();
         serverStatus.reset();
         Arrays.stream(connectors).forEach(con -> {
-            if (con.getIcapSessionManager().getIcSession().isConnected()) {
-                con.disconnect();
+            try {
+                if (con.getIcapSessionManager().getIcSession().isConnected()) {
+                    con.disconnect();
+                }
+                con.connect();
+            } catch (SessionException e) {
+                log.error("Session exception caught: {}", e.getLocalizedMessage());
             }
-            con.connect();
         });
     }
 

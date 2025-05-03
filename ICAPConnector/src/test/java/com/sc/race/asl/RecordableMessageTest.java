@@ -1,12 +1,13 @@
 package com.sc.race.asl;
 
 import com.icap.iConnect.srcMsgs.iCMsg.*;
+import net.zousys.mathtrading.interfaces.tpicap.ParsingException;
 import net.zousys.mathtrading.interfaces.tpicap.tracing.RecordableMessage;
 import org.junit.jupiter.api.Test;
 
 public class RecordableMessageTest {
     @Test
-    public void testSerialize() {
+    public void testSerialize() throws ParsingException {
         ICMsg msg = new ICMsgLogUpdate();
         byte[] bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
         assert (bytes.length == 201);
@@ -16,7 +17,7 @@ public class RecordableMessageTest {
     }
 
     //    @Test
-    public void testSerialize2() {
+    public void testSerialize2() throws ParsingException {
         ICMsg msg = new ICMsgPositive();
         byte[] bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
         assert (bytes.length == 201);
@@ -26,7 +27,7 @@ public class RecordableMessageTest {
     }
 
     //    @Test
-    public void testSerialize3() {
+    public void testSerialize3() throws ParsingException {
         ICMsg msg = new ICMsgPositiveLogin();
         byte[] bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
         assert (bytes.length == 201);
@@ -36,7 +37,7 @@ public class RecordableMessageTest {
     }
 
     @Test
-    public void testSerialize4() {
+    public void testSerialize4() throws ParsingException {
         ICMsg msg = new ICMsgHeartbeat();
         byte[] bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
         assert (bytes.length == 201);
@@ -46,7 +47,7 @@ public class RecordableMessageTest {
     }
 
     @Test
-    public void testSerialize5() {
+    public void testSerialize5() throws ParsingException {
         ICMsg msg = new ICMsgClearBookUpdate();
         byte[] bytes = new RecordableMessage(msg, System.currentTimeMillis()).serialize();
         assert (bytes.length == 201);

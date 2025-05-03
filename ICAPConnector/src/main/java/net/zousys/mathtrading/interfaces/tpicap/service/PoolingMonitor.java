@@ -49,7 +49,7 @@ public class PoolingMonitor {
                 try {
                     monitorFolder();
                 } catch (IOException | InterruptedException e) {
-                    System.err.println("Error monitoring folder: " + e.getMessage());
+                    log.error("Error monitoring folder: " + e.getMessage());
                 }
             }, monitorService);
         }
