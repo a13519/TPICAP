@@ -20,8 +20,6 @@ import java.util.concurrent.Executors;
 @Slf4j
 @Configuration
 public class EssentialConfig {
-    @Value("${app.pool.connector}")
-    private int poolConnector;
     @Value("${app.pool.processor}")
     private int poolProcessor;
     @Value("${app.pool.recorder}")

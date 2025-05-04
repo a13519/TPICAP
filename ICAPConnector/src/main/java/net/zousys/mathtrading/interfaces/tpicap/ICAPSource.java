@@ -25,8 +25,6 @@ import java.util.concurrent.Flow;
 @Slf4j
 @Component
 public class ICAPSource implements Source {
-    @Value("${app.pool.connector}")
-    private int poolConnector;
     @Autowired
     private ServerStatus serverStatus;
     @Autowired
