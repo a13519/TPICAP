@@ -34,17 +34,28 @@ public class RecordableMessage<T extends ICMsg> {
      */
     public static <T extends ICMsg> RecordableMessage parse(byte[] data) throws ParsingException {
         try {
+//            ByteBuffer bb = ByteBuffer.wrap(data);
+//            byte type = bb.get();
+//            bb.position(1);
+//            ByteBuffer sub = bb.slice();
+//            T msg = (T) RecordableMessage.getICMessage(null, EICMsgType.getName((int) type));
+//            ICMessageBuffer buffer = new ICMessageBuffer();
+//            buffer.put(sub);
+//            buffer.flip();
+//            buffer.limit(buffer.capacity());
+//            msg.unpack(buffer);
+//            return new RecordableMessage(msg, System.currentTimeMillis());
+
+            byte type = data[17];
             ByteBuffer bb = ByteBuffer.wrap(data);
-            byte type = bb.get();
-            bb.position(1);
-            ByteBuffer sub = bb.slice();
             T msg = (T) RecordableMessage.getICMessage(null, EICMsgType.getName((int) type));
             ICMessageBuffer buffer = new ICMessageBuffer();
-            buffer.put(sub);
+            buffer.put(bb);
             buffer.flip();
             buffer.limit(buffer.capacity());
             msg.unpack(buffer);
             return new RecordableMessage(msg, System.currentTimeMillis());
+
         } catch (Exception e) {
             throw new ParsingException("ICMsg parsing exception");
         }
@@ -54,11 +65,14 @@ public class RecordableMessage<T extends ICMsg> {
      * @return
      */
     public byte[] serialize() {
+//        ByteBuffer mbb = getByteBuffer();
+//        ByteBuffer bb = ByteBuffer.allocate(mbb.capacity() + 1);
+//        bb.put((byte) icMsg.getMsgType().getValue());
+//        bb.put(mbb);
+//        return bb.array();
+
         ByteBuffer mbb = getByteBuffer();
-        ByteBuffer bb = ByteBuffer.allocate(mbb.capacity() + 1);
-        bb.put((byte) icMsg.getMsgType().getValue());
-        bb.put(mbb);
-        return bb.array();
+        return mbb.array();
     }
 
     /**

@@ -5,6 +5,7 @@ import com.icap.iConnect.srcMsgs.iCMsg.*;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
 import net.zousys.mathtrading.interfaces.tpicap.ParsingException;
+import net.zousys.mathtrading.interfaces.tpicap.tracing.RecordableMessage;
 import net.zousys.mathtrading.interfaces.util.FileReader;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +17,7 @@ public class ICAPMessageTest {
     public void testCBUFileData() throws IOException, ParsingException {
         byte[] bb = FileReader.readFileToBytes(getClass().getClassLoader().getResourceAsStream("1745911350698_eMsgClearBook.irm"));
         ICMsgClearBookUpdate lu = (ICMsgClearBookUpdate) ICAPMessage.parse(bb).getIcMsg();
+//        ICMsgClearBookUpdate lu = (ICMsgClearBookUpdate) RecordableMessage.parse(bb).getIcMsg();
         StringBuffer sb = new StringBuffer();
         lu.dump(sb);
         log.info(sb.toString());
@@ -68,9 +70,21 @@ public class ICAPMessageTest {
         StringBuffer sb = new StringBuffer();
         lu.dump(sb);
         log.info(sb.toString());
-        ICMsgElectronicTransaction l;
         assert (lu != null);
         assert (lu.getMsgType().equals(EICMsgType.eMsgPositiveLogin));
+        assert (lu.getFirmId().equals("000001"));
+    }
+
+
+    @Test
+    public void testETData() throws IOException, ParsingException {
+        byte[] bb = FileReader.readFileToBytes(getClass().getClassLoader().getResourceAsStream("icap/1745939895420_eMsgElectronicTransaction.irm"));
+        ICMsgElectronicTransaction lu = (ICMsgElectronicTransaction) ICAPMessage.parse(bb).getIcMsg();
+        StringBuffer sb = new StringBuffer();
+        lu.dump(sb);
+        log.info(sb.toString());
+        assert (lu != null);
+        assert (lu.getMsgType().equals(EICMsgType.eMsgElectronicTransaction));
         assert (lu.getFirmId().equals("000001"));
     }
 }
