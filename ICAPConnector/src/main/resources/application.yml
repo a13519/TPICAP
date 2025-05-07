@@ -37,6 +37,7 @@ app:
     proxyPort: -1
     key: devscrpstpic
     value: test
+    online: false
   session:
     begin: "0 0 6 * * *"    # 6:00 AM daily in prod EDT time
     end: "0 0 20 * * *"     # 20:00 PM daily in prod EDT time

@@ -31,6 +31,8 @@ public class InterfaceConfiguration {
     private String value;
     @Value("${app.connection.ssl}")
     private Boolean ssl;
+    @Value("${app.connection.online}")
+    private Boolean online;
     @Autowired
     private ICAPMessageRepo icapMessageRepo;
     @Autowired
@@ -74,7 +76,7 @@ public class InterfaceConfiguration {
                                 .value(value)
                                 .proxyHost(proxyHost)
                                 .proxyPort(proxyPort).build(),
-                        icapMessageRepo, icapDispatchQueue, initCommands(), closeCommands(), serverStatus
+                        icapMessageRepo, icapDispatchQueue, initCommands(), closeCommands(), serverStatus, online
                 )
         };
     }

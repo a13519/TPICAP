@@ -37,7 +37,6 @@ public class ICAPSource implements Source {
 
     /**
      * @param connectors
-     * @param collectorService
      * @param processorService
      * @param subscriber
      */

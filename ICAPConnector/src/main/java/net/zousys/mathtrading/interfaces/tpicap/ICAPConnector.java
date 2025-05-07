@@ -28,7 +28,7 @@ public class ICAPConnector extends Connector implements ICCallback {
     private List<ICAPMessage> closeCommands;
     private ServerStatus serverStatus;
     public Boolean started = false;
-
+    public Boolean online = true;
     /**
      * @param serverSignature
      * @param icapMessageRepo
@@ -40,7 +40,8 @@ public class ICAPConnector extends Connector implements ICCallback {
             ICAPDispatchQueue icapDispatchQueue,
             List<ICAPMessage> initCommands,
             List<ICAPMessage> closeCommands,
-            ServerStatus serverStatus) {
+            ServerStatus serverStatus,
+            boolean online) {
         super();
         this.serverSignature = serverSignature;
         this.icapMessageRepo = icapMessageRepo;
@@ -51,7 +52,7 @@ public class ICAPConnector extends Connector implements ICCallback {
         this.icapSessionManager = ICAPSessionManager.builder()
                 .serverSignature(serverSignature)
                 .icCallback(this).build();
-
+        this.online = online;
         CompletableFuture.runAsync(() -> {
             while (true) {
                 if (!icapDispatchQueue.isEmpty()) {
@@ -68,10 +69,12 @@ public class ICAPConnector extends Connector implements ICCallback {
      */
     @Override
     public void connect() throws SessionException {
-        icapSessionManager.openSession(serverSignature, this);
-        icapDispatchQueue.push(initCommands);
+        if (online) {
+            icapSessionManager.openSession(serverSignature, this);
+            icapDispatchQueue.push(initCommands);
+            maintainSession();
+        }
         started = true;
-        maintainSession();
     }
 
     /**
@@ -79,7 +82,9 @@ public class ICAPConnector extends Connector implements ICCallback {
      */
     @Override
     public void disconnect() {
-        icapSessionManager.closeSession(closeCommands);
+        if (online) {
+            icapSessionManager.closeSession(closeCommands);
+        }
     }
 
     /**
@@ -87,7 +92,7 @@ public class ICAPConnector extends Connector implements ICCallback {
      */
     @Override
     public void maintainSession() {
-        if (started) {
+        if (started&&online) {
             log.debug("Checking session...");
             if (!icapSessionManager.getIcSession().isConnected()) {
                 serverStatus.getSessionCut().incrementAndGet();
