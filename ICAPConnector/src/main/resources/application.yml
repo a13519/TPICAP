@@ -37,7 +37,7 @@ app:
     proxyPort: -1
     key: devscrpstpic
     value: test
-    online: false
+    online: true
   session:
     begin: "0 0 6 * * *"    # 6:00 AM daily in prod EDT time
     end: "0 0 20 * * *"     # 20:00 PM daily in prod EDT time
@@ -59,7 +59,7 @@ app:
     message:
       # ALL: business message and session message
       # BUSINESS: business message only
-      serialize-level: BUSINESS
+      serialize-level: ALL
       # NONE: Nothing to trace (not recommended)
       # BUSINESS: businesss only
       # INBOUND: inbound message only
