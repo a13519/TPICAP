@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.tpicap.ICAPMessage;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -29,19 +30,46 @@ public class Recorder {
      * @param executorService
      */
     public static final void recordMessage(ICAPMessage message, Path root, ExecutorService executorService) {
+        recordMessage(message.serialize(), message.getType(), message.getTime(), root, executorService);
+    }
+
+    /**
+     *
+     * @param is
+     * @param type
+     * @param time
+     * @param root
+     * @param executorService
+     */
+    public static final void recordMessage(InputStream is, String type, long time, Path root, ExecutorService executorService) {
+        try {
+            recordMessage(is.readAllBytes(), type, time, root, executorService);
+        } catch (IOException e) {
+            log.error("InputStream readAllBytes error: " + e.getLocalizedMessage());
+        }
+    }
+    /**
+     *
+     * @param data
+     * @param type
+     * @param time
+     * @param root
+     * @param executorService
+     */
+    public static final void recordMessage(byte[] data, String type, long time, Path root, ExecutorService executorService) {
         CompletableFuture.runAsync(() -> {
             try {
                 Path subroot = root.resolve(dateTag());
                 Files.createDirectories(subroot);
-                Path filepath = subroot.resolve(messageId(message.getTime(), message.getType()) + ".irm");
-                Files.write(filepath, message.serialize()); // Write byte array to file
-                filepath.toFile().setLastModified(message.getTime());
+                Path filepath = subroot.resolve(messageId(time, type) + ".irm");
+                Files.write(filepath, data); // Write byte array to file
+                filepath.toFile().setLastModified(time);
                 log.info("Message was recorded: " + filepath);
             } catch (IOException e) {
                 log.error("Record ICSMsg error: " + e.getLocalizedMessage());
-                log.error("ICMsg was not stored {}.{}", message.getType(), message.getIcMsg().getSequenceNumber());
+                log.error("ICMsg was not stored {}.{}", type, time);
                 log.error("------------------");
-                log.error(message.toString());
+                log.error(new String(data));
                 log.error("------------------");
             }
         }, executorService);
