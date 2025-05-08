@@ -70,6 +70,7 @@ app:
       # 0: no housekeeping
       # n: days to clean
       housekeeping: 0
+    scripting: true
   pooling:
     active: true
     path: tracing/pooling              # pooling forlder for testing

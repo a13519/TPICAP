@@ -23,8 +23,12 @@ import java.util.concurrent.ExecutorService;
 @Slf4j
 @Component
 public class ICMessageRecorder extends Recorder {
+    public static final String IMS = ".ims";
+    public static final String IRM = ".irm";
     @Value("${app.tracing.path.raw}")
     private String icmsgTraceRoot;
+    @Value("${app.tracing.scripting}")
+    private Boolean scripting;
     @Autowired
     private EssentialConfig.EnumConfig enumConfig;
     @Autowired
@@ -35,10 +39,30 @@ public class ICMessageRecorder extends Recorder {
     private boolean detailed;
 
     /**
-     * @param msg
+     *
+     * @param content
+     * @param type
+     * @param time
+     * @param executorService
      * @return
      */
-    public static final boolean logMessage(ICAPMessage msg, boolean detailed, EssentialConfig.EnumConfig enumConfig, MsgClassifier classifier) {
+    public final void logMessage(String content, String type, long time, ExecutorService executorService) {
+        log.info(content);
+        if (scripting && executorService != null) {
+            recordMessage(content.getBytes(), IMS, type, time, new File(icmsgTraceRoot).toPath(), executorService);
+        }
+    }
+
+    /**
+     *
+     * @param msg
+     * @param detailed
+     * @param enumConfig
+     * @param classifier
+     * @param executorService
+     * @return
+     */
+    public final boolean logMessage(ICAPMessage msg, boolean detailed, EssentialConfig.EnumConfig enumConfig, MsgClassifier classifier, ExecutorService executorService) {
         boolean bSuccess = true;
         if (enumConfig.getContentLevel() != Constants.ContentLevel.NONE) {
             EICMsgType msgType = msg.icMsg.getMsgType();
@@ -50,11 +74,11 @@ public class ICMessageRecorder extends Recorder {
                         break;
                     }
                     case EICMsgType.eMsgPositive -> {
-                        log.info(MessageLogGenerator.generateLog(detailed, (ICMsgPositive) msg.icMsg, "Pos. Resp"));
+                        logMessage(MessageLogGenerator.generateLog(detailed, (ICMsgPositive) msg.icMsg, "Pos. Resp"), msg.getType(), msg.getTime(), executorService);
                         break;
                     }
                     case EICMsgType.eMsgNegative -> {
-                        log.info(MessageLogGenerator.generateLog(detailed, (ICMsgNegative) msg.icMsg, "Neg. Resp", ((ICMsgNegative) msg.icMsg).getDescription()));
+                        logMessage(MessageLogGenerator.generateLog(detailed, (ICMsgNegative) msg.icMsg, "Neg. Resp", ((ICMsgNegative) msg.icMsg).getDescription()), msg.getType(), msg.getTime(), executorService);
                         break;
                     }
                     case EICMsgType.eMsgPositiveLogin -> {
@@ -62,11 +86,11 @@ public class ICMessageRecorder extends Recorder {
                         break;
                     }
                     case EICMsgType.eMsgMessageLogUpdate -> {
-                        log.info(MessageLogGenerator.generateLog(detailed, (ICMsgLogUpdate) msg.icMsg, "LogUpdate", ((ICMsgLogUpdate) msg.icMsg).getMessage()));
+                        logMessage(MessageLogGenerator.generateLog(detailed, (ICMsgLogUpdate) msg.icMsg, "LogUpdate", ((ICMsgLogUpdate) msg.icMsg).getMessage()), msg.getType(), msg.getTime(), executorService);
                         break;
                     }
                     case EICMsgType.eMsgClearBook -> {
-                        log.info(MessageLogGenerator.generateLog(detailed, (ICMsgClearBookUpdate) msg.icMsg, "ClearBook"));
+                        logMessage(MessageLogGenerator.generateLog(detailed, (ICMsgClearBookUpdate) msg.icMsg, "ClearBook"), msg.getType(), msg.getTime(), executorService);
                         break;
                     }
 
@@ -77,14 +101,14 @@ public class ICMessageRecorder extends Recorder {
                             sBuff.append("Invalid Msg received (MsgType: " + unkmessage.getOriginMsgType().getValue() + ")\n");
                             sBuff.append("API Version: " + unkmessage.getSoftwareVersion() + "\n");
                             sBuff.append("Desc: " + unkmessage.getDescription() + "\n");
-                            log.info(MessageLogGenerator.generateLog(detailed, unkmessage, "Unknown", sBuff.toString()));
+                            logMessage(MessageLogGenerator.generateLog(detailed, unkmessage, "Unknown", sBuff.toString()), msg.getType(), msg.getTime(), executorService);
                         }
                         break;
                     }
                     default -> {
                         StringBuffer sBuff = new StringBuffer();
                         sBuff.append("\nMsg received (MsgType: " + msg.getType() + ")\n");
-                        log.info(MessageLogGenerator.generateLog(detailed, msg.icMsg, sBuff.toString()));
+                        logMessage(MessageLogGenerator.generateLog(detailed, msg.icMsg, sBuff.toString()), msg.getType(), msg.getTime(), executorService);
                         bSuccess = false;
                     }
                 }
@@ -98,8 +122,8 @@ public class ICMessageRecorder extends Recorder {
      * @return
      */
     public boolean record(ICAPMessage msg) {
-        recordMessage(msg, new File(icmsgTraceRoot).toPath(), recorderService);
-        return logMessage(msg, detailed, enumConfig, classifier);
+        recordMessage(msg, IRM, new File(icmsgTraceRoot).toPath(), recorderService);
+        return logMessage(msg, detailed, enumConfig, classifier, recorderService);
     }
 
 

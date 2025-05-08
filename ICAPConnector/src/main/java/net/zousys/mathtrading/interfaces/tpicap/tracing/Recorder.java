@@ -25,25 +25,28 @@ public class Recorder {
     }
 
     /**
+     *
      * @param message
+     * @param ext
      * @param root
      * @param executorService
      */
-    public static final void recordMessage(ICAPMessage message, Path root, ExecutorService executorService) {
-        recordMessage(message.serialize(), message.getType(), message.getTime(), root, executorService);
+    public static final void recordMessage(ICAPMessage message, String ext, Path root, ExecutorService executorService) {
+        recordMessage(message.serialize(), ext, message.getType(), message.getTime(), root, executorService);
     }
 
     /**
      *
      * @param is
+     * @param ext
      * @param type
      * @param time
      * @param root
      * @param executorService
      */
-    public static final void recordMessage(InputStream is, String type, long time, Path root, ExecutorService executorService) {
+    public static final void recordMessage(InputStream is, String ext, String type, long time, Path root, ExecutorService executorService) {
         try {
-            recordMessage(is.readAllBytes(), type, time, root, executorService);
+            recordMessage(is.readAllBytes(), ext, type, time, root, executorService);
         } catch (IOException e) {
             log.error("InputStream readAllBytes error: " + e.getLocalizedMessage());
         }
@@ -56,12 +59,12 @@ public class Recorder {
      * @param root
      * @param executorService
      */
-    public static final void recordMessage(byte[] data, String type, long time, Path root, ExecutorService executorService) {
+    public static final void recordMessage(byte[] data, String ext, String type, long time, Path root, ExecutorService executorService) {
         CompletableFuture.runAsync(() -> {
             try {
                 Path subroot = root.resolve(dateTag());
                 Files.createDirectories(subroot);
-                Path filepath = subroot.resolve(messageId(time, type) + ".irm");
+                Path filepath = subroot.resolve(messageId(time, type) + ext);
                 Files.write(filepath, data); // Write byte array to file
                 filepath.toFile().setLastModified(time);
                 log.info("Message was recorded: " + filepath);
