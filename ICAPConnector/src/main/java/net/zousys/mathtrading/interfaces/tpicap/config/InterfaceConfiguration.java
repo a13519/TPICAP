@@ -17,22 +17,7 @@ import java.util.List;
 
 @Configuration
 public class InterfaceConfiguration {
-    @Value("${app.connection.proxyHost:null}")
-    private String proxyHost;
-    @Value("${app.connection.proxyPort:-1}")
-    private int proxyPort;
-    @Value("${app.connection.host}")
-    private String host;
-    @Value("${app.connection.port}")
-    private int port;
-    @Value("${app.connection.key}")
-    private String key;
-    @Value("${app.connection.value}")
-    private String value;
-    @Value("${app.connection.ssl}")
-    private Boolean ssl;
-    @Value("${app.connection.online}")
-    private Boolean online;
+
     @Autowired
     private ICAPMessageRepo icapMessageRepo;
     @Autowired
@@ -59,26 +44,6 @@ public class InterfaceConfiguration {
         msgs.add(new ICAPMessage(new ICMsgOrderBookRemove()));
         msgs.add(new ICAPMessage(new ICMsgTradeBookRemove()));
         return msgs;
-    }
-
-    /**
-     * @return
-     */
-    @Bean
-    public ICAPConnector[] connectors() {
-        return new ICAPConnector[]{
-                new ICAPConnector(
-                        ServerSignature.builder()
-                                .ssl(ssl)
-                                .host(host)
-                                .port(port)
-                                .key(key)
-                                .value(value)
-                                .proxyHost(proxyHost)
-                                .proxyPort(proxyPort).build(),
-                        icapMessageRepo, icapDispatchQueue, initCommands(), closeCommands(), serverStatus, online
-                )
-        };
     }
 
     /**

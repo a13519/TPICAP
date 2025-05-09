@@ -27,8 +27,7 @@ public class ICAPSessionManager implements Flow.Subscriber<ICAPMessage> {
     /**
      * @throws SessionException
      */
-    protected void openSession(ServerSignature serverSignature, ICCallback icCallback) throws SessionException {
-        this.serverSignature = serverSignature;
+    protected void openSession(ICCallback icCallback) throws SessionException {
         this.icCallback = icCallback;
         icSession = ICSessionMngr.getMngr().createSession(
                 serverSignature.getKey(),

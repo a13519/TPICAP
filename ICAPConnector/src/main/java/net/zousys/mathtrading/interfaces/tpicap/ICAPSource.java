@@ -10,14 +10,18 @@ import net.zousys.mathtrading.interfaces.tpicap.model.ServerStatus;
 import net.zousys.mathtrading.interfaces.tpicap.service.TradeVaultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Flow;
+import java.util.stream.IntStream;
 
 /**
  *
@@ -25,28 +29,33 @@ import java.util.concurrent.Flow;
 @Slf4j
 @Component
 public class ICAPSource implements Source {
+    @Value("${app.pool.connector}")
+    private int poolConnector;
     @Autowired
     private ServerStatus serverStatus;
     @Autowired
     private ICAPMessageRepo icapMessageRepo;
     @Autowired
     private TradeVaultService tradeVaultService;
-    private ExecutorService processorService;
-    private Flow.Subscriber<Message> subscriber;
-    private ICAPConnector[] connectors;
+    @Autowired
+    private ApplicationContext applicationContext;
 
+    private ExecutorService processorService;
+    private ExecutorService connectorService;
+    private Flow.Subscriber<Message> subscriber;
+    private List<ICAPConnector> connectors = new ArrayList<>();
     /**
-     * @param connectors
      * @param processorService
+     * @param connectorService
      * @param subscriber
      */
     @Autowired
     public ICAPSource(
-            ICAPConnector[] connectors,
             ExecutorService processorService,
+            ExecutorService connectorService,
             Flow.Subscriber<Message> subscriber) {
-        this.connectors = connectors;
         this.processorService = processorService;
+        this.connectorService = connectorService;
         this.subscriber = subscriber;
     }
 
@@ -55,11 +64,18 @@ public class ICAPSource implements Source {
      */
     @Override
     public void startDeamon() {
-        try {
-            connectors[0].connect();
-        } catch (SessionException re) {
-            log.error("Exception from connector connect: " + re.getLocalizedMessage());
-        }
+        IntStream.range(0, poolConnector).forEach(i -> {
+            ICAPConnector connector = applicationContext.getBean(ICAPConnector.class);
+            connectors.add(connector);
+            CompletableFuture.runAsync(() -> {
+                try {
+                    connector.connect();
+                } catch (SessionException re) {
+                    log.error("Exception from connector connect: " + re.getLocalizedMessage());
+                }
+            }, connectorService);
+        });
+
         CompletableFuture.runAsync(() -> {
             while (true) {
                 if (!icapMessageRepo.isEmpty()) {
@@ -76,7 +92,7 @@ public class ICAPSource implements Source {
      */
     @Override
     public void checkSession() {
-        Arrays.stream(connectors).forEach(connector -> connector.maintainSession());
+        connectors.forEach(connector -> connector.maintainSession());
     }
 
     /**
@@ -86,7 +102,7 @@ public class ICAPSource implements Source {
     public void restartTheSessionTask() {
         tradeVaultService.reloadTradeVault();
         serverStatus.reset();
-        Arrays.stream(connectors).forEach(con -> {
+        connectors.forEach(con -> {
             try {
                 if (con.getIcapSessionManager().getIcSession().isConnected()) {
                     con.disconnect();

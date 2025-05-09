@@ -3,6 +3,7 @@ package net.zousys.mathtrading.interfaces.tpicap.config;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.tpicap.model.MsgClassifier;
+import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -22,11 +23,26 @@ import java.util.concurrent.Executors;
 public class EssentialConfig {
     @Value("${app.pool.processor}")
     private int poolProcessor;
+    @Value("${app.pool.connector}")
+    private int poolConnector;
     @Value("${app.pool.recorder}")
     private int poolRecorder;
     @Value("${app.timezone}")
     private String timezone;
-
+    @Value("${app.connection.proxyHost:null}")
+    private String proxyHost;
+    @Value("${app.connection.proxyPort:-1}")
+    private int proxyPort;
+    @Value("${app.connection.host}")
+    private String host;
+    @Value("${app.connection.port}")
+    private int port;
+    @Value("${app.connection.key}")
+    private String key;
+    @Value("${app.connection.value}")
+    private String value;
+    @Value("${app.connection.ssl}")
+    private boolean ssl;
     /**
      * @return
      */
@@ -49,6 +65,11 @@ public class EssentialConfig {
     @Bean
     public ExecutorService processorService() {
         return Executors.newFixedThreadPool(poolProcessor);
+    }
+
+    @Bean
+    public ExecutorService connectorService() {
+        return Executors.newFixedThreadPool(poolConnector);
     }
 
     @Bean
@@ -79,6 +100,17 @@ public class EssentialConfig {
         private Constants.SerializeLevel serializeLevel;
     }
 
+    @Bean
+    public ServerSignature serverSignature() {
+        return ServerSignature.builder()
+                .ssl(ssl)
+                .host(host)
+                .port(port)
+                .key(key)
+                .value(value)
+                .proxyHost(proxyHost)
+                .proxyPort(proxyPort).build();
+    }
     @Bean
     public ZoneId zoneId() {
         return ZoneId.of(timezone);

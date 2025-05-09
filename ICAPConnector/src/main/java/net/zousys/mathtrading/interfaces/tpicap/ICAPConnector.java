@@ -12,13 +12,23 @@ import net.zousys.mathtrading.interfaces.tpicap.model.ICAPDispatchQueue;
 import net.zousys.mathtrading.interfaces.tpicap.model.ICAPMessageRepo;
 import net.zousys.mathtrading.interfaces.tpicap.model.ServerSignature;
 import net.zousys.mathtrading.interfaces.tpicap.model.ServerStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
 @Slf4j
+@Component
+@Scope("prototype")
 public class ICAPConnector extends Connector implements ICCallback {
+
+    @Value("${app.connection.online}")
+    private boolean online;
+
     private ServerSignature serverSignature;
     @Getter
     private ICAPSessionManager icapSessionManager;
@@ -28,30 +38,35 @@ public class ICAPConnector extends Connector implements ICCallback {
     private List<ICAPMessage> closeCommands;
     private ServerStatus serverStatus;
     public Boolean started = false;
-    public Boolean online = true;
+
     /**
-     * @param serverSignature
+     *
      * @param icapMessageRepo
+     * @param icapDispatchQueue
      * @param initCommands
+     * @param closeCommands
+     * @param serverStatus
      */
+    @Autowired
     public ICAPConnector(
             ServerSignature serverSignature,
             ICAPMessageRepo icapMessageRepo,
             ICAPDispatchQueue icapDispatchQueue,
             List<ICAPMessage> initCommands,
             List<ICAPMessage> closeCommands,
-            ServerStatus serverStatus,
-            boolean online) {
+            ServerStatus serverStatus) {
         super();
-        this.serverSignature = serverSignature;
         this.icapMessageRepo = icapMessageRepo;
         this.icapDispatchQueue = icapDispatchQueue;
         this.initCommands = initCommands;
         this.closeCommands = closeCommands;
         this.serverStatus = serverStatus;
+        this.serverSignature = serverSignature;
         this.icapSessionManager = ICAPSessionManager.builder()
                 .serverSignature(serverSignature)
-                .icCallback(this).build();
+                .icCallback(this)
+                .build();
+
         this.online = online;
         CompletableFuture.runAsync(() -> {
             while (true) {
@@ -64,13 +79,15 @@ public class ICAPConnector extends Connector implements ICCallback {
         }, Executors.newSingleThreadExecutor());
     }
 
+
+
     /**
      *
      */
     @Override
     public void connect() throws SessionException {
         if (online) {
-            icapSessionManager.openSession(serverSignature, this);
+            icapSessionManager.openSession(this);
             icapDispatchQueue.push(initCommands);
             maintainSession();
         }

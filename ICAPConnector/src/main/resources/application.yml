@@ -32,7 +32,10 @@ app:
   connection:
     ssl: false
     host: 204.179.96.165
+#    host: 204.179.96.165
+#    host: 204.179.96.168
     port: 6264
+#    port: 6443
     proxyHost:
     proxyPort: -1
     key: devscrpstpic
@@ -44,6 +47,7 @@ app:
     refresh: 240000
     status: 240000
   pool:
+    connector: 1
     processor: 4           # processor pool size
     recorder: 5            # recorder pool size
   tracing:
@@ -59,7 +63,7 @@ app:
     message:
       # ALL: business message and session message
       # BUSINESS: business message only
-      serialize-level: ALL
+      serialize-level: BUSINESS
       # NONE: Nothing to trace (not recommended)
       # BUSINESS: businesss only
       # INBOUND: inbound message only
