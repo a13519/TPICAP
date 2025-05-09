@@ -109,18 +109,20 @@ public class ICAPConnector extends Connector implements ICCallback {
      */
     @Override
     public void maintainSession() {
-        if (started&&online) {
-            log.debug("Checking session...");
-            if (!icapSessionManager.getIcSession().isConnected()) {
-                serverStatus.getSessionCut().incrementAndGet();
-                log.warn("Session is broken, let's reconnect it...");
-                try {
-                    disconnect();
-                    connect();
-                } catch (SessionException e) {
-                    log.error("Session exception caught: {}", e.getLocalizedMessage());
+        if (online) {
+//            if (started&&online) {
+                log.debug("Checking session...");
+                if (!icapSessionManager.getIcSession().isConnected()) {
+                    serverStatus.getSessionCut().incrementAndGet();
+                    log.warn("Session is broken, let's reconnect it...");
+                    try {
+                        disconnect();
+                        connect();
+                    } catch (SessionException e) {
+                        log.error("Session exception caught: {}", e.getLocalizedMessage());
+                    }
                 }
-            }
+
         }
     }
 
