@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 public class Recorder {
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    protected static final String dateTag() {
+    public static final String dateTag() {
         return LocalDate.now().format(formatter);
     }
 

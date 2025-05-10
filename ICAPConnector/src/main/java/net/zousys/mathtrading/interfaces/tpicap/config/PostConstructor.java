@@ -1,16 +1,21 @@
 package net.zousys.mathtrading.interfaces.tpicap.config;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import net.zousys.mathtrading.interfaces.tpicap.model.TradeVault;
 import net.zousys.mathtrading.interfaces.tpicap.repository.TradeVaultRepository;
 import net.zousys.mathtrading.interfaces.tpicap.service.TradeVaultService;
+import net.zousys.mathtrading.interfaces.tpicap.tracing.Recorder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZoneId;
-
+@Slf4j
 @Component
 public class PostConstructor {
     @Value("${app.tracing.path.success}")
@@ -59,6 +64,12 @@ public class PostConstructor {
         }
         if (!archiverFile.exists()) {
             archiverFile.mkdirs();
+        }
+        Path subroot = new File(raw).toPath().resolve(Recorder.dateTag());
+        try {
+            Files.createDirectories(subroot);
+        } catch (IOException e) {
+            log.error("Failed to create directory: {}", subroot);
         }
         tradeVaultService.reloadTradeVault();
     }

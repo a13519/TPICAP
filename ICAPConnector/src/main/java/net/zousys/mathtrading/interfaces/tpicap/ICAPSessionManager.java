@@ -95,16 +95,19 @@ public class ICAPSessionManager implements Flow.Subscriber<ICAPMessage> {
      * @return
      */
     protected boolean closeSession(List<ICAPMessage> msgList) {
-        if (msgList != null && msgList.size() > 0) {
-            msgList.forEach(msg -> icSession.send(msg.getIcMsg()));
+        if (icSession!=null&&icSession.isConnected()) {
+            if (msgList != null && msgList.size() > 0) {
+                msgList.forEach(msg -> icSession.send(msg.getIcMsg()));
+            }
+            icSession.disconnect();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                log.warn("Closing session, sleep interruption. Program continue: " + e.getLocalizedMessage());
+            }
+            return true;
         }
-        icSession.disconnect();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            log.warn("Closing session, sleep interruption. Program continue: " + e.getLocalizedMessage());
-        }
-        return true;
+        return false;
     }
 
     @Override
