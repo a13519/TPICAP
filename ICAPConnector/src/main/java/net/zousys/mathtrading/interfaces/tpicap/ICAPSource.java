@@ -104,9 +104,7 @@ public class ICAPSource implements Source {
         serverStatus.reset();
         connectors.forEach(con -> {
             try {
-                if (con.getIcapSessionManager().getIcSession().isConnected()) {
-                    con.disconnect();
-                }
+                con.disconnect();
                 con.connect();
             } catch (SessionException e) {
                 log.error("Session exception caught: {}", e.getLocalizedMessage());
