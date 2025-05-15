@@ -2,6 +2,8 @@ package net.zousys.mathtrading.interfaces.tpicap.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +36,8 @@ public class ArchivingService {
     /**
      *
      */
-    @Scheduled(cron = "0 0 2 * * ?")
+//    @Scheduled(cron = "0 0 2 * * ?")
+    @EventListener(ApplicationReadyEvent.class)
     public void archiveAll() {
         File success = new File(sucessPath);
         File pending = new File(pendingPath);
@@ -55,11 +58,11 @@ public class ArchivingService {
      * @throws IOException
      */
     public void archiveMessageFiles(File file) throws IOException {
-        String archiveFileName = String.format(archiverPath, file.getName(), System.currentTimeMillis());
-        Path archivePath = Paths.get(archiveFileName);
+        File archiveFile = new File(archiverPath, file.getName()+"_"+System.currentTimeMillis()+".zip");
+        Path archivePath = Paths.get(archiveFile.getAbsolutePath());
         Files.createDirectories(archivePath.getParent());
 
-        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archiveFileName))) {
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archiveFile))) {
             Path basePath = file.toPath();
             Files.walkFileTree(basePath, new SimpleFileVisitor<Path>() {
                 @Override
@@ -75,7 +78,7 @@ public class ArchivingService {
                 }
             });
         }
-        log.info("Archive created: " + archiveFileName);
+        log.info("Archive created: " + archiveFile);
     }
 
     /**
