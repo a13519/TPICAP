@@ -1,78 +1,83 @@
-import java.io.File;
-import java.io.FileInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import java.io.FileOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ZipOldFolders {
-    public static void main(String[] args) {
-        String rootDirPath = "path/to/root/directory"; // Replace with your root directory path
-        long daysThreshold = 10;
+@Component
+public class FolderZipper {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FolderZipper.class);
+    private static final String ROOT_DIR = "/path/to/root/directory"; // Replace with your directory path
+    private static final String OUTPUT_ZIP = "/path/to/output/archive.zip"; // Replace with desired zip file path
+    private static final long DAYS_OLD = 10;
+
+    @Scheduled(cron = "0 0 1 * * ?") // Runs daily at 1 AM
+    public void zipOldFolders() {
         try {
-            zipFoldersOlderThan(rootDirPath, daysThreshold);
-        } catch (Exception e) {
-            e.printStackTrace();
+            Path rootPath = Paths.get(ROOT_DIR);
+            Instant cutoff = Instant.now().minus(DAYS_OLD, ChronoUnit.DAYS);
+
+            // Create or overwrite the zip file
+            try (FileOutputStream fos = new FileOutputStream(OUTPUT_ZIP);
+                 ZipOutputStream zos = new ZipOutputStream(fos)) {
+
+                // Find subdirectories older than 10 days
+                try (DirectoryStream<Path> stream = Files.newDirectoryStream(rootPath, Files::isDirectory)) {
+                    for (Path folder : stream) {
+                        BasicFileAttributes attrs = Files.readAttributes(folder, BasicFileAttributes.class);
+                        if (attrs.lastModifiedTime().toInstant().isBefore(cutoff)) {
+                            LOGGER.info("Zipping folder: {}", folder.getFileName());
+                            zipFolder(folder, zos);
+                            // Optionally delete the folder
+                            Files.walk(folder)
+                                    .sorted(Comparator.reverseOrder())
+                                    .map(Path::toFile)
+                                    .forEach(file -> {
+                                        if (file.delete()) {
+                                            LOGGER.debug("Deleted: {}", file.getPath());
+                                        } else {
+                                            LOGGER.warn("Failed to delete: {}", file.getPath());
+                                        }
+                                    });
+                        }
+                    }
+                }
+                LOGGER.info("Zip file created at: {}", OUTPUT_ZIP);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error zipping folders: {}", e.getMessage(), e);
         }
     }
 
-    public static void zipFoldersOlderThan(String rootDirPath, long daysThreshold) throws Exception {
-        Path rootPath = Paths.get(rootDirPath);
-        Instant threshold = Instant.now().minus(daysThreshold, ChronoUnit.DAYS);
+    private void zipFolder(Path folder, ZipOutputStream zos) throws IOException {
+        Files.walk(folder)
+                .forEach(path -> {
+                    try {
+                        // Skip directories themselves, only process files
+                        if (!Files.isDirectory(path)) {
+                            // Create zip entry relative to the root directory
+                            String zipEntryName = folder.getParent().relativize(path).toString();
+                            ZipEntry zipEntry = new ZipEntry(zipEntryName);
+                            zos.putNextEntry(zipEntry);
 
-        // Walk through the root directory (one level deep for subfolders)
-        Files.list(rootPath)
-             .filter(Files::isDirectory) // Only directories
-             .filter(path -> {
-                 try {
-                     FileTime lastModified = Files.getLastModifiedTime(path);
-                     return lastModified.toInstant().isBefore(threshold);
-                 } catch (Exception e) {
-                     e.printStackTrace();
-                     return false;
-                 }
-             })
-             .forEach(path -> {
-                 try {
-                     zipFolder(path, path.getFileName() + ".zip");
-                 } catch (Exception e) {
-                     e.printStackTrace();
-                 }
-             });
-    }
-
-    public static void zipFolder(Path folderPath, String zipFileName) throws Exception {
-        File zipFile = new File(folderPath.getParent().toString(), zipFileName);
-        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile))) {
-            Files.walk(folderPath)
-                 .filter(path -> !Files.isDirectory(path)) // Only files, not directories
-                 .forEach(path -> {
-                     try {
-                         // Create zip entry with relative path
-                         String relativePath = folderPath.getParent().relativize(path).toString();
-                         ZipEntry zipEntry = new ZipEntry(relativePath);
-                         zos.putNextEntry(zipEntry);
-
-                         // Write file content to zip
-                         try (FileInputStream fis = new FileInputStream(path.toFile())) {
-                             byte[] buffer = new byte[1024];
-                             int len;
-                             while ((len = fis.read(buffer)) > 0) {
-                                 zos.write(buffer, 0, len);
-                             }
-                         }
-                         zos.closeEntry();
-                     } catch (Exception e) {
-                         e.printStackTrace();
-                     }
-                 });
-        }
-        System.out.println("Created zip: " + zipFile.getAbsolutePath());
+                            // Write file content to zip
+                            Files.copy(path, zos);
+                            zos.closeEntry();
+                            LOGGER.debug("Added to zip: {}", zipEntryName);
+                        }
+                    } catch (IOException e) {
+                        LOGGER.error("Error adding {} to zip: {}", path, e.getMessage(), e);
+                    }
+                });
     }
 }
