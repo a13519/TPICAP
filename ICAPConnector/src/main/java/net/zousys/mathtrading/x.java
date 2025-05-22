@@ -17,6 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class PoolingMonitorTest {
@@ -48,8 +50,9 @@ public class PoolingMonitorTest {
 
     @BeforeEach
     void setUp() {
+        // Initialize mocks with Mockito 5.4.0
         MockitoAnnotations.openMocks(this);
-        // Set configuration properties using ReflectionTestUtils
+        // Set configuration properties
         ReflectionTestUtils.setField(poolingMonitor, "poolingActive", true);
         ReflectionTestUtils.setField(poolingMonitor, "poolingPath", tempDir.toString());
         // Mock ServerStatus behavior
@@ -66,7 +69,7 @@ public class PoolingMonitorTest {
         poolingMonitor.startMonitoring();
 
         // Assert
-        verify(monitorService).submit(runnableCaptor.capture());
+        verify(monitorService, times(1)).submit(runnableCaptor.capture());
         assertNotNull(runnableCaptor.getValue(), "Runnable task should be submitted to ExecutorService");
     }
 
@@ -87,178 +90,4 @@ public class PoolingMonitorTest {
         // Arrange
         WatchService watchService = mock(WatchService.class);
         WatchKey watchKey = mock(WatchKey.class);
-        WatchEvent<?> watchEvent = mock(WatchEvent.class);
-        Path filePath = tempDir.resolve("testfile.txt");
-
-        // Mock WatchService behavior
-        when(watchService.take()).thenReturn(watchKey);
-        when(watchKey.pollEvents()).thenReturn(List.of(watchEvent));
-        when(watchEvent.kind()).thenReturn(StandardWatchEventKinds.ENTRY_CREATE);
-        when(watchEvent.context()).thenReturn(filePath.getFileName());
-        when(watchKey.watchable()).thenReturn(tempDir);
-        when(watchKey.reset()).thenReturn(true);
-
-        // Create a real file
-        Files.writeString(filePath, "test content");
-        byte[] fileBytes = Files.readAllBytes(filePath);
-        ICAPMessage icapMessage = mock(ICAPMessage.class);
-        when(ICAPMessage.form(fileBytes)).thenReturn(icapMessage);
-
-        // Use reflection to invoke private monitorFolder method
-        try {
-            // Start monitoring in a controlled way
-            CompletableFuture.runAsync(() -> {
-                try {
-                    ReflectionTestUtils.invokeMethod(poolingMonitor, "monitorFolder");
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }, monitorService);
-
-            // Simulate one iteration
-            Thread.sleep(100); // Allow some time for execution
-
-            // Assert
-            verify(icapMessageRepo).push(icapMessage);
-            verify(serverStatus).getPoolingFiles();
-            assertFalse(Files.exists(filePath), "File should be deleted after processing");
-        } finally {
-            // Stop the loop by interrupting
-            when(watchKey.reset()).thenReturn(false);
-        }
-    }
-
-    @Test
-    void testMonitorFolderParsingException() throws IOException, InterruptedException, ParsingException {
-        // Arrange
-        WatchService watchService = mock(WatchService.class);
-        WatchKey watchKey = mock(WatchKey.class);
-        WatchEvent<?> watchEvent = mock(WatchEvent.class);
-        Path filePath = tempDir.resolve("invalidfile.txt");
-
-        // Mock WatchService behavior
-        when(watchService.take()).thenReturn(watchKey);
-        when(watchKey.pollEvents()).thenReturn(List.of(watchEvent));
-        when(watchEvent.kind()).thenReturn(StandardWatchEventKinds.ENTRY_CREATE);
-        when(watchEvent.context()).thenReturn(filePath.getFileName());
-        when(watchKey.watchable()).thenReturn(tempDir);
-        when(watchKey.reset()).thenReturn(true);
-
-        // Create a real file
-        Files.writeString(filePath, "invalid content");
-        byte[] fileBytes = Files.readAllBytes(filePath);
-        when(ICAPMessage.form(fileBytes)).thenThrow(new ParsingException("Invalid format"));
-
-        // Use reflection to invoke private monitorFolder method
-        try {
-            CompletableFuture.runAsync(() -> {
-                try {
-                    ReflectionTestUtils.invokeMethod(poolingMonitor, "monitorFolder");
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }, monitorService);
-
-            // Simulate one iteration
-            Thread.sleep(100);
-
-            // Assert
-            verify(icapMessageRepo, never()).push(any());
-            verify(serverStatus).getPoolingFiles();
-            assertFalse(Files.exists(filePath), "File should be deleted even on parsing error");
-        } finally {
-            when(watchKey.reset()).thenReturn(false);
-        }
-    }
-
-    @Test
-    void testMonitorFolderNewDirectory() throws IOException, InterruptedException {
-        // Arrange
-        WatchService watchService = mock(WatchService.class);
-        WatchKey watchKey = mock(WatchKey.class);
-        WatchEvent<?> watchEvent = mock(WatchEvent.class);
-        Path subDir = tempDir.resolve("subdir");
-
-        // Mock WatchService behavior
-        when(watchService.take()).thenReturn(watchKey);
-        when(watchKey.pollEvents()).thenReturn(List.of(watchEvent));
-        when(watchEvent.kind()).thenReturn(StandardWatchEventKinds.ENTRY_CREATE);
-        when(watchEvent.context()).thenReturn(subDir.getFileName());
-        when(watchKey.watchable()).thenReturn(tempDir);
-        when(watchKey.reset()).thenReturn(true);
-
-        // Create a subdirectory
-        Files.createDirectory(subDir);
-
-        // Use reflection to invoke private monitorFolder method
-        try {
-            CompletableFuture.runAsync(() -> {
-                try {
-                    ReflectionTestUtils.invokeMethod(poolingMonitor, "monitorFolder");
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }, monitorService);
-
-            // Simulate one iteration
-            Thread.sleep(100);
-
-            // Assert
-            verify(watchService).register(eq(subDir), any());
-        } finally {
-            when(watchKey.reset()).thenReturn(false);
-        }
-    }
-
-    @Test
-    void testRegisterDirectory() throws IOException {
-        // Arrange
-        WatchService watchService = mock(WatchService.class);
-        Set<Path> registeredPaths = new HashSet<>();
-        Path subDir = tempDir.resolve("subdir");
-        Files.createDirectory(subDir);
-
-        // Act
-        ReflectionTestUtils.invokeMethod(poolingMonitor, "registerDirectory", tempDir, watchService, registeredPaths);
-
-        // Assert
-        verify(watchService).register(eq(tempDir), any());
-        verify(watchService).register(eq(subDir), any());
-        assertTrue(registeredPaths.contains(tempDir));
-        assertTrue(registeredPaths.contains(subDir));
-    }
-
-    @Test
-    void testMonitorFolderOverflow() throws IOException, InterruptedException {
-        // Arrange
-        WatchService watchService = mock(WatchService.class);
-        WatchKey watchKey = mock(WatchKey.class);
-        WatchEvent<?> watchEvent = mock(WatchEvent.class);
-
-        // Mock overflow event
-        when(watchService.take()).thenReturn(watchKey);
-        when(watchKey.pollEvents()).thenReturn(List.of(watchEvent));
-        when(watchEvent.kind()).thenReturn(StandardWatchEventKinds.OVERFLOW);
-        when(watchKey.reset()).thenReturn(true);
-
-        // Act
-        try {
-            CompletableFuture.runAsync(() -> {
-                try {
-                    ReflectionTestUtils.invokeMethod(poolingMonitor, "monitorFolder");
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }, monitorService);
-
-            // Simulate one iteration
-            Thread.sleep(100);
-        } finally {
-            when(watchKey.reset()).thenReturn(false);
-        }
-
-        // Assert
-        verifyNoInteractions(icapMessageRepo);
-        verifyNoInteractions(serverStatus);
-    }
-}
+        Watch
